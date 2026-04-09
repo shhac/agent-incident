@@ -136,6 +136,23 @@ All `--since` / `--from` / `--to` flags accept:
 - **RFC3339** — `2024-01-15T10:00:00Z`
 - **Unix epoch** — `1705312800`
 
+## API key scopes
+
+When creating an API key at `https://app.incident.io/~/settings/api-keys`, select these roles based on what you need:
+
+| Role | Required for | Required? |
+|---|---|---|
+| `viewer` | All read operations (incidents, alerts, severities, statuses, users, roles, custom-fields, catalog) | **Yes** |
+| `incident_creator` | `incidents create` | If creating incidents |
+| `incident_editor` | `incidents edit` | If editing incidents |
+| `catalog_viewer` | `catalog types/entries list/get` | If browsing catalog |
+| `schedules_reader` | `schedules list/get/entries` | If checking on-call |
+| `schedule_overrides_editor` | `schedules override` | If overriding on-call |
+| `escalation_creator` | `escalations create` | If escalating incidents |
+| `status_page_publisher` | `status-pages incidents create/update` | If updating status pages |
+
+**Minimum for read-only triage:** `viewer` + `schedules_reader` + `catalog_viewer`
+
 ## Environment variables
 
 | Variable | Purpose |
