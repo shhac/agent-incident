@@ -149,10 +149,10 @@ type incidentWrapper struct {
 func (c *Client) ListIncidents(ctx context.Context, opts ListIncidentsOpts) ([]Incident, string, error) {
 	params := url.Values{}
 	for _, sc := range opts.StatusCategory {
-		params.Add("status_category[]", sc)
+		params.Add("status_category[one_of][]", sc)
 	}
 	for _, sev := range opts.Severity {
-		params.Add("severity[]", sev)
+		params.Add("severity[one_of][]", sev)
 	}
 	addPaginationParams(params, opts.PageSize, opts.After)
 

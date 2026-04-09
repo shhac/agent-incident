@@ -64,8 +64,8 @@ func TestIncidentsList(t *testing.T) {
 	if gotMethod != http.MethodGet {
 		t.Errorf("expected GET, got %s", gotMethod)
 	}
-	if vals := gotQuery["status_category[]"]; len(vals) == 0 || vals[0] != "active" {
-		t.Errorf("expected status_category[]=active, got %v", gotQuery["status_category[]"])
+	if vals := gotQuery["status_category[one_of][]"]; len(vals) == 0 || vals[0] != "active" {
+		t.Errorf("expected status_category[one_of][]=active, got %v", gotQuery["status_category[one_of][]"])
 	}
 	if vals := gotQuery["page_size"]; len(vals) == 0 || vals[0] != "10" {
 		t.Errorf("expected page_size=10, got %v", gotQuery["page_size"])
