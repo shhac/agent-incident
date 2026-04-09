@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/shhac/agent-incident/internal/cli/auth"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
 
@@ -38,6 +39,9 @@ func newRootCmd(version string) *cobra.Command {
 	root.PersistentFlags().StringVar(&flagAPIKey, "api-key", "", "API key (overrides stored credentials)")
 	root.PersistentFlags().StringVar(&flagFormat, "format", "", "Output format: json, yaml, jsonl")
 	root.PersistentFlags().IntVar(&flagTimeout, "timeout", 0, "Request timeout in milliseconds")
+
+	registerLLMHelpCommand(root)
+	auth.Register(root)
 
 	return root
 }
