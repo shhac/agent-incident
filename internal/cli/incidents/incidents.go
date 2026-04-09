@@ -48,6 +48,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		status   []string
 		severity []string
 		since    string
+		until    string
 		limit    int
 		after    string
 		full     bool
@@ -59,7 +60,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
 
-			var createdAfter string
+			var createdAfter, createdBefore string
 			if since != "" {
 				t, err := shared.ParseTime(since)
 				if err != nil {
@@ -67,12 +68,20 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 				}
 				createdAfter = t.Format(time.RFC3339)
 			}
+			if until != "" {
+				t, err := shared.ParseTime(until)
+				if err != nil {
+					return err
+				}
+				createdBefore = t.Format(time.RFC3339)
+			}
 
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				opts := api.ListIncidentsOpts{
 					StatusCategory: status,
 					Severity:       severity,
 					CreatedAfter:   createdAfter,
+					CreatedBefore:  createdBefore,
 					PageSize:       limit,
 					After:          after,
 				}
@@ -97,7 +106,8 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 	cmd.Flags().StringSliceVar(&status, "status", nil, "Filter by status category (active, closed, etc.)")
 	cmd.Flags().StringSliceVar(&severity, "severity", nil, "Filter by severity name")
-	cmd.Flags().StringVar(&since, "since", "", "Filter incidents created after this time")
+	cmd.Flags().StringVar(&since, "since", "", "Only show incidents created after this time")
+	cmd.Flags().StringVar(&until, "until", "", "Only show incidents created before this time")
 	cmd.Flags().IntVar(&limit, "limit", 25, "Number of results per page")
 	cmd.Flags().StringVar(&after, "after", "", "Pagination cursor")
 	cmd.Flags().BoolVar(&full, "full", false, "Return full incident objects instead of compact")

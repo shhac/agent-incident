@@ -133,6 +133,7 @@ type ListIncidentsOpts struct {
 	StatusCategory []string
 	Severity       []string
 	CreatedAfter   string // RFC3339 timestamp for created_at[gte] filter
+	CreatedBefore  string // RFC3339 timestamp for created_at[lte] filter
 	PageSize       int
 	After          string
 }
@@ -157,6 +158,9 @@ func (c *Client) ListIncidents(ctx context.Context, opts ListIncidentsOpts) ([]I
 	}
 	if opts.CreatedAfter != "" {
 		params.Set("created_at[gte]", opts.CreatedAfter)
+	}
+	if opts.CreatedBefore != "" {
+		params.Set("created_at[lte]", opts.CreatedBefore)
 	}
 	addPaginationParams(params, opts.PageSize, opts.After)
 

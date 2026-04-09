@@ -47,6 +47,7 @@ type ListAlertsOpts struct {
 	Status           []string
 	DeduplicationKey string
 	CreatedAfter     string // RFC3339 timestamp for created_at[gte] filter
+	CreatedBefore    string // RFC3339 timestamp for created_at[lte] filter
 	PageSize         int
 	After            string
 }
@@ -77,6 +78,9 @@ func (c *Client) ListAlerts(ctx context.Context, opts ListAlertsOpts) (*ListAler
 	}
 	if opts.CreatedAfter != "" {
 		params.Set("created_at[gte]", opts.CreatedAfter)
+	}
+	if opts.CreatedBefore != "" {
+		params.Set("created_at[lte]", opts.CreatedBefore)
 	}
 	addPaginationParams(params, opts.PageSize, opts.After)
 
