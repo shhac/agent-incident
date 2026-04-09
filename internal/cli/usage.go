@@ -26,70 +26,49 @@ AUTH SETUP
   agent-incident auth remove <alias>
 
 INCIDENTS (triage starting point)
-  agent-incident incidents list [--status <status>] [--severity <sev>] [--since <time>] [--full]
-  agent-incident incidents get <id>
-  agent-incident incidents create --name <text> --severity <sev> [--summary <text>]
-  agent-incident incidents edit <id> [--status <status>] [--severity <sev>] [--summary <text>]
-  agent-incident incidents updates <id>
+  agent-incident incident list [--status <status>] [--severity <sev>] [--since <time>] [--full]
+  agent-incident incident get <id-or-reference>       # accepts INC-2000, 2000, or UUID
+  agent-incident incident create --name <text> --severity <sev-id> [--summary <text>]
+  agent-incident incident edit <id> [--name <text>] [--severity <sev-id>] [--summary <text>]
+  agent-incident incident updates <id>
 
 ALERTS
-  agent-incident alerts list [--status firing|resolved] [--source <src>] [--since <time>] [--full]
-  agent-incident alerts get <id>
-  agent-incident alerts create --source-id <id> --title <text> [--description <text>]
-  agent-incident alerts incidents
+  agent-incident alert list [--status firing|resolved] [--source <src>] [--full]
+  agent-incident alert get <id>
+  agent-incident alert create --source-id <id> --title <text> [--description <text>]
+  agent-incident alert incidents
 
-SEVERITIES
-  agent-incident severities list
-  agent-incident severities get <id>
+ACTIONS & FOLLOW-UPS
+  agent-incident action list [--incident <id>]
+  agent-incident action get <id>
+  agent-incident follow-up list [--incident <id>]
+  agent-incident follow-up get <id>
 
-STATUSES
-  agent-incident statuses list
-  agent-incident statuses get <id>
-
-USERS
-  agent-incident users list [--query <text>] [--full]
-  agent-incident users get <id>
-
-ROLES
-  agent-incident roles list
-  agent-incident roles get <id>
-
-SCHEDULES
-  agent-incident schedules list
-  agent-incident schedules get <id>
-  agent-incident schedules entries <id> [--from <time>] [--to <time>]
-  agent-incident schedules override <id> --user <id> --from <time> --to <time>
-
-ESCALATIONS
-  agent-incident escalations list
-  agent-incident escalations get <id>
-  agent-incident escalations create --incident <id> --path <id>
-  agent-incident escalations paths list
-  agent-incident escalations paths get <id>
-
-ACTIONS
-  agent-incident actions list [--incident <id>]
-  agent-incident actions get <id>
-
-FOLLOW-UPS
-  agent-incident follow-ups list [--incident <id>]
-  agent-incident follow-ups get <id>
-
-CATALOG
-  agent-incident catalog types list
-  agent-incident catalog types get <id>
-  agent-incident catalog entries list --type <id> [--query <text>]
-  agent-incident catalog entries get <id>
-
-CUSTOM FIELDS
-  agent-incident custom-fields list
-  agent-incident custom-fields get <id>
+ON-CALL & ESCALATION
+  agent-incident oncall schedule list
+  agent-incident oncall schedule get <id>
+  agent-incident oncall schedule entries <id> [--from <time>] [--to <time>]
+  agent-incident oncall schedule override <id> --user <id> --from <time> --to <time>
+  agent-incident oncall escalation list
+  agent-incident oncall escalation get <id>
+  agent-incident oncall escalation create --incident <id> --path <id>
+  agent-incident oncall escalation path list
+  agent-incident oncall escalation path get <id>
 
 STATUS PAGES
-  agent-incident status-pages list
-  agent-incident status-pages incidents list [--page <id>]
-  agent-incident status-pages incidents create --page <id> --name <text>
-  agent-incident status-pages incidents update <id> --status <status>
+  agent-incident status-page list
+  agent-incident status-page update list [--page <id>]
+  agent-incident status-page update create --page <id> --name <text>
+  agent-incident status-page update update <id> [--status <status>]
+
+REFERENCE DATA
+  agent-incident ref severity list / get <id>
+  agent-incident ref status list / get <id>
+  agent-incident ref role list / get <id>
+  agent-incident ref user list [--query <text>] [--full] / get <id>
+  agent-incident ref custom-field list / get <id>
+  agent-incident ref catalog types list / get <id>
+  agent-incident ref catalog entries list [--type <id>] [--query <text>] / get <id>
 
 TIME FORMATS
   Relative: now-15m, now-1h, now-1d, now+1h, now+30m
@@ -102,5 +81,5 @@ GLOBAL FLAGS
   --format json|yaml|jsonl (default: jsonl for lists, json for single items)
   --timeout <ms>
 
-Per-domain details: agent-incident <domain> llm-help
+Per-domain details: agent-incident <command> llm-help
 `

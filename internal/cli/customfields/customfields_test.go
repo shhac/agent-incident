@@ -39,7 +39,7 @@ func TestCustomFieldsList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"custom-fields", "list"})
+	root.SetArgs([]string{"custom-field", "list"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -65,7 +65,7 @@ func TestCustomFieldsGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"custom-fields", "get", "cf-42"})
+	root.SetArgs([]string{"custom-field", "get", "cf-42"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)

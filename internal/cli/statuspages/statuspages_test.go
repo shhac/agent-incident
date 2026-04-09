@@ -39,7 +39,7 @@ func TestStatusPagesList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"status-pages", "list"})
+	root.SetArgs([]string{"status-page", "list"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -67,7 +67,7 @@ func TestStatusPagesIncidentsList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"status-pages", "incidents", "list"})
+	root.SetArgs([]string{"status-page", "update", "list"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -102,7 +102,7 @@ func TestStatusPagesIncidentsCreate(t *testing.T) {
 
 	root := newTestRoot()
 	root.SetArgs([]string{
-		"status-pages", "incidents", "create",
+		"status-page", "update", "create",
 		"--page", "sp-1",
 		"--name", "API Degradation",
 	})
@@ -146,7 +146,7 @@ func TestStatusPagesIncidentsUpdate(t *testing.T) {
 
 	root := newTestRoot()
 	root.SetArgs([]string{
-		"status-pages", "incidents", "update", "spi-1",
+		"status-page", "update", "update", "spi-1",
 		"--status", "resolved",
 	})
 

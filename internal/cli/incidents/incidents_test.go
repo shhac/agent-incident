@@ -52,7 +52,7 @@ func TestIncidentsList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"incidents", "list", "--status", "active", "--limit", "10"})
+	root.SetArgs([]string{"incident", "list", "--status", "active", "--limit", "10"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -91,7 +91,7 @@ func TestIncidentsGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"incidents", "get", "01ABC123DEF456"})
+	root.SetArgs([]string{"incident", "get", "01ABC123DEF456"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -127,7 +127,7 @@ func TestIncidentsCreate(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"incidents", "create", "--name", "New Incident", "--summary", "Something broke"})
+	root.SetArgs([]string{"incident", "create", "--name", "New Incident", "--summary", "Something broke"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -172,7 +172,7 @@ func TestIncidentsEdit(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"incidents", "edit", "inc-edit", "--summary", "Updated summary"})
+	root.SetArgs([]string{"incident", "edit", "inc-edit", "--summary", "Updated summary"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -214,7 +214,7 @@ func TestIncidentsUpdates(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"incidents", "updates", "inc-42"})
+	root.SetArgs([]string{"incident", "updates", "inc-42"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)

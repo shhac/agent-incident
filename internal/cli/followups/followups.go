@@ -11,8 +11,8 @@ import (
 
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:     "follow-ups",
-		Aliases: []string{"followups"},
+		Use:     "follow-up",
+		Aliases: []string{"followup"},
 		Short:   "List and inspect post-incident follow-ups",
 	}
 

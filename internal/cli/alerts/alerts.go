@@ -13,7 +13,7 @@ import (
 // Register adds the alerts command group to the root command.
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	alerts := &cobra.Command{
-		Use:   "alerts",
+		Use:   "alert",
 		Short: "Manage alerts and alert events",
 	}
 

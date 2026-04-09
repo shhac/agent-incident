@@ -55,19 +55,37 @@ func newRootCmd(version string) *cobra.Command {
 
 	registerLLMHelpCommand(root)
 	auth.Register(root)
+
+	// Core triage
 	incidents.Register(root, allGlobals)
 	alerts.Register(root, allGlobals)
-	severities.Register(root, allGlobals)
-	statuses.Register(root, allGlobals)
-	users.Register(root, allGlobals)
-	roles.Register(root, allGlobals)
-	schedules.Register(root, allGlobals)
-	escalations.Register(root, allGlobals)
 	actions.Register(root, allGlobals)
 	followups.Register(root, allGlobals)
-	catalog.Register(root, allGlobals)
-	customfields.Register(root, allGlobals)
+
+	// On-call & escalation
+	oncall := &cobra.Command{
+		Use:   "oncall",
+		Short: "On-call schedules, overrides, and escalations",
+	}
+	schedules.Register(oncall, allGlobals)
+	escalations.Register(oncall, allGlobals)
+	root.AddCommand(oncall)
+
+	// Status pages
 	statuspages.Register(root, allGlobals)
+
+	// Reference data
+	ref := &cobra.Command{
+		Use:   "ref",
+		Short: "Reference data lookups (severities, statuses, roles, users, fields, catalog)",
+	}
+	severities.Register(ref, allGlobals)
+	statuses.Register(ref, allGlobals)
+	roles.Register(ref, allGlobals)
+	users.Register(ref, allGlobals)
+	customfields.Register(ref, allGlobals)
+	catalog.Register(ref, allGlobals)
+	root.AddCommand(ref)
 
 	return root
 }

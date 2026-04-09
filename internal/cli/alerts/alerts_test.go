@@ -50,7 +50,7 @@ func TestAlertsList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"alerts", "list", "--status", "firing", "--limit", "5"})
+	root.SetArgs([]string{"alert", "list", "--status", "firing", "--limit", "5"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -86,7 +86,7 @@ func TestAlertsGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"alerts", "get", "alert-99"})
+	root.SetArgs([]string{"alert", "get", "alert-99"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -119,7 +119,7 @@ func TestAlertsCreate(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"alerts", "create", "--source-id", "src-abc", "--title", "New Alert", "--description", "Something happened"})
+	root.SetArgs([]string{"alert", "create", "--source-id", "src-abc", "--title", "New Alert", "--description", "Something happened"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)

@@ -40,7 +40,7 @@ func TestUsersList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"users", "list"})
+	root.SetArgs([]string{"user", "list"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -66,7 +66,7 @@ func TestUsersGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"users", "get", "u-42"})
+	root.SetArgs([]string{"user", "get", "u-42"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)

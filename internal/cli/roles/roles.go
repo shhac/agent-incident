@@ -11,7 +11,7 @@ import (
 
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	role := &cobra.Command{
-		Use:   "roles",
+		Use:   "role",
 		Short: "List and inspect incident roles",
 	}
 

@@ -8,7 +8,7 @@ incident.io triage CLI for AI agents. Focused on incident response workflows —
 make build          # Build binary
 make test           # Run all tests
 make vet            # Go vet
-make dev ARGS="incidents list --status active"
+make dev ARGS="incident list --status active"
 ```
 
 ## Testing
@@ -24,7 +24,7 @@ Tests use `shared.SetupMockServer()` which creates an `httptest.Server` and inje
 
 ```
 cmd/agent-incident/main.go     → cli.Execute(version)
-internal/cli/root.go           → cobra root command, global flags
+internal/cli/root.go           → cobra root command, global flags, oncall/ref groups
 internal/cli/<domain>/         → domain commands (Register pattern)
 internal/cli/shared/           → GlobalFlags, WithClient, output helpers, timeparse
 internal/api/client.go         → HTTP client, error classification
@@ -37,8 +37,9 @@ internal/output/               → JSON/YAML/NDJSON formatting, null pruning
 
 ## Key Patterns
 
-- Domain commands register via `Register(root, globals)` where globals is `func() *shared.GlobalFlags`
+- Domain commands register via `Register(parent, globals)` where parent is root, oncall, or ref group
 - Auth commands register via `Register(root)` (no globals needed)
+- Commands use singular names: `incident`, `alert`, `schedule` (not plural)
 - `shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx, client) error)` resolves credentials and handles errors
 - All errors written to stderr as structured JSON with `fixable_by` classification
 - Output: NDJSON default for lists, JSON for single items, `--format` flag overrides

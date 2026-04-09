@@ -39,7 +39,7 @@ func TestStatusesList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"statuses", "list"})
+	root.SetArgs([]string{"status", "list"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -70,7 +70,7 @@ func TestStatusesGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"statuses", "get", "st-99"})
+	root.SetArgs([]string{"status", "get", "st-99"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)

@@ -39,7 +39,7 @@ func TestFollowUpsList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"follow-ups", "list"})
+	root.SetArgs([]string{"follow-up", "list"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -65,7 +65,7 @@ func TestFollowUpsGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"follow-ups", "get", "fu-42"})
+	root.SetArgs([]string{"follow-up", "get", "fu-42"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)

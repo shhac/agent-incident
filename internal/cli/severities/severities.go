@@ -11,7 +11,7 @@ import (
 
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	sev := &cobra.Command{
-		Use:   "severities",
+		Use:   "severity",
 		Short: "List and inspect incident severities",
 	}
 

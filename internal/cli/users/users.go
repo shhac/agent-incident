@@ -11,7 +11,7 @@ import (
 
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	usr := &cobra.Command{
-		Use:   "users",
+		Use:   "user",
 		Short: "List and inspect incident.io users",
 	}
 

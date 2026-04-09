@@ -39,7 +39,7 @@ func TestEscalationsList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"escalations", "list"})
+	root.SetArgs([]string{"escalation", "list"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -65,7 +65,7 @@ func TestEscalationsGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"escalations", "get", "esc-42"})
+	root.SetArgs([]string{"escalation", "get", "esc-42"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -96,7 +96,7 @@ func TestEscalationsCreate(t *testing.T) {
 
 	root := newTestRoot()
 	root.SetArgs([]string{
-		"escalations", "create",
+		"escalation", "create",
 		"--incident", "inc-1",
 		"--path", "path-1",
 	})

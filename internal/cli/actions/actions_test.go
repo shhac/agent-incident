@@ -39,7 +39,7 @@ func TestActionsList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"actions", "list"})
+	root.SetArgs([]string{"action", "list"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -65,7 +65,7 @@ func TestActionsGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"actions", "get", "act-42"})
+	root.SetArgs([]string{"action", "get", "act-42"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)

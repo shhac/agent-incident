@@ -12,7 +12,7 @@ import (
 // Register adds the schedules command group to the root command.
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	schedules := &cobra.Command{
-		Use:   "schedules",
+		Use:   "schedule",
 		Short: "Manage on-call schedules",
 	}
 

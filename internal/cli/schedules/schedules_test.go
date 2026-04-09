@@ -39,7 +39,7 @@ func TestSchedulesList(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"schedules", "list"})
+	root.SetArgs([]string{"schedule", "list"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -65,7 +65,7 @@ func TestSchedulesGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"schedules", "get", "sched-42"})
+	root.SetArgs([]string{"schedule", "get", "sched-42"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -102,7 +102,7 @@ func TestSchedulesOverride(t *testing.T) {
 
 	root := newTestRoot()
 	root.SetArgs([]string{
-		"schedules", "override", "sched-1",
+		"schedule", "override", "sched-1",
 		"--user", "user-1",
 		"--from", "2026-04-09T10:00:00Z",
 		"--to", "2026-04-09T18:00:00Z",

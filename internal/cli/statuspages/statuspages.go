@@ -11,21 +11,21 @@ import (
 
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:     "status-pages",
-		Aliases: []string{"statuspages"},
-		Short:   "Manage status pages and their incidents",
+		Use:     "status-page",
+		Aliases: []string{"statuspage"},
+		Short:   "Manage status pages and their updates",
 	}
 
 	registerList(cmd, globals)
 
-	incidents := &cobra.Command{
-		Use:   "incidents",
-		Short: "Manage status page incidents",
+	update := &cobra.Command{
+		Use:   "update",
+		Short: "Manage status page updates",
 	}
-	registerIncidentsList(incidents, globals)
-	registerIncidentsCreate(incidents, globals)
-	registerIncidentsUpdate(incidents, globals)
-	cmd.AddCommand(incidents)
+	registerIncidentsList(update, globals)
+	registerIncidentsCreate(update, globals)
+	registerIncidentsUpdate(update, globals)
+	cmd.AddCommand(update)
 
 	registerLLMHelp(cmd)
 	root.AddCommand(cmd)

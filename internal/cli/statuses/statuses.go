@@ -11,7 +11,7 @@ import (
 
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	st := &cobra.Command{
-		Use:   "statuses",
+		Use:   "status",
 		Short: "List and inspect incident statuses",
 	}
 

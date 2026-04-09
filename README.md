@@ -6,7 +6,7 @@ incident.io triage CLI for AI agents. Incidents, alerts, schedules, escalations 
 - **Structured error classification** — every error includes `fixable_by: agent|human|retry` so AI agents can self-correct without parsing messages
 - **Triage-focused** — only the commands you need during an investigation, not the 165+ incident.io API endpoints
 - **Multi-org support** — switch between incident.io organizations with `--organization`, credentials stored in macOS Keychain
-- **Self-documenting** — `agent-incident llm-help` and per-domain `agent-incident <domain> llm-help` for agent-friendly reference
+- **Self-documenting** — `agent-incident llm-help` and per-command `agent-incident <command> llm-help` for agent-friendly reference
 
 ### Why not the incident.io API directly?
 
@@ -51,44 +51,50 @@ export INCIDENT_API_KEY=<key>
 
 ```bash
 # All active incidents
-agent-incident incidents list --status active
+agent-incident incident list --status active
 
-# Full details for a specific incident
-agent-incident incidents get inc_123
+# Full details (accepts INC-2000, 2000, or UUID)
+agent-incident incident get INC-2000
 ```
 
 ### 3. Triage
 
 ```bash
 # What alerts are firing?
-agent-incident alerts list --status firing
+agent-incident alert list --status firing
 
 # Who's on-call?
-agent-incident schedules entries <schedule-id> --from now --to now+1h
+agent-incident oncall schedule entries <schedule-id> --from now --to now+1h
 
 # Escalate
-agent-incident escalations create --incident inc_123 --path <path-id>
+agent-incident oncall escalation create --incident <id> --path <path-id>
 ```
 
 ## Command map
 
 ```text
 agent-incident
-├── auth            add, check, default, list, remove
-├── incidents       list, get, create, edit, updates
-├── alerts          list, get, create, incidents
-├── severities      list, get
-├── statuses        list, get
-├── users           list, get
-├── roles           list, get
-├── schedules       list, get, entries, override
-├── escalations     list, get, create, paths list, paths get
-├── actions         list, get
-├── follow-ups      list, get
-├── catalog         types list, types get, entries list, entries get
-├── custom-fields   list, get
-├── status-pages    list, incidents list, incidents create, incidents update
-├── llm-help        top-level reference card
+├── auth                  add, check, default, list, remove
+├── incident              list, get, create, edit, updates
+├── alert                 list, get, create, incidents
+├── action                list, get
+├── follow-up             list, get
+├── oncall
+│   ├── schedule          list, get, entries, override
+│   └── escalation        list, get, create
+│       └── path          list, get
+├── status-page           list
+│   └── update            list, create, update
+├── ref
+│   ├── severity          list, get
+│   ├── status            list, get
+│   ├── role              list, get
+│   ├── user              list, get
+│   ├── custom-field      list, get
+│   └── catalog
+│       ├── types         list, get
+│       └── entries       list, get
+├── llm-help              top-level reference card
 └── version
 ```
 
@@ -122,7 +128,7 @@ agent-incident auth add prod --api-key <key>
 agent-incident auth add staging --api-key <key>
 
 # Query a specific org
-agent-incident incidents list --status active --organization staging
+agent-incident incident list --status active --organization staging
 
 # Set a default
 agent-incident auth default prod
@@ -143,13 +149,13 @@ When creating an API key at `https://app.incident.io/~/settings/api-keys`, selec
 | Role | Required for | Required? |
 |---|---|---|
 | `viewer` | All read operations (incidents, alerts, severities, statuses, users, roles, custom-fields, catalog) | **Yes** |
-| `incident_creator` | `incidents create` | If creating incidents |
-| `incident_editor` | `incidents edit` | If editing incidents |
-| `catalog_viewer` | `catalog types/entries list/get` | If browsing catalog |
-| `schedules_reader` | `schedules list/get/entries` | If checking on-call |
-| `schedule_overrides_editor` | `schedules override` | If overriding on-call |
-| `escalation_creator` | `escalations create` | If escalating incidents |
-| `status_page_publisher` | `status-pages incidents create/update` | If updating status pages |
+| `incident_creator` | `incident create` | If creating incidents |
+| `incident_editor` | `incident edit` | If editing incidents |
+| `catalog_viewer` | `ref catalog types/entries` | If browsing catalog |
+| `schedules_reader` | `oncall schedule list/get/entries` | If checking on-call |
+| `schedule_overrides_editor` | `oncall schedule override` | If overriding on-call |
+| `escalation_creator` | `oncall escalation create` | If escalating incidents |
+| `status_page_publisher` | `status-page update create/update` | If updating status pages |
 
 **Minimum for read-only triage:** `viewer` + `schedules_reader` + `catalog_viewer`
 
@@ -166,7 +172,7 @@ When creating an API key at `https://app.incident.io/~/settings/api-keys`, selec
 make build          # Build binary
 make test           # Run all tests
 make vet            # Go vet
-make dev ARGS="incidents list --status active"
+make dev ARGS="incident list --status active"
 ```
 
 ## License

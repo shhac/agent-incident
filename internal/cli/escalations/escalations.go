@@ -12,7 +12,7 @@ import (
 // Register adds the escalations command group to the root command.
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	escalations := &cobra.Command{
-		Use:   "escalations",
+		Use:   "escalation",
 		Short: "Manage escalations and escalation paths",
 	}
 
@@ -104,7 +104,7 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerPaths(parent *cobra.Command, globals shared.GlobalsFunc) {
 	paths := &cobra.Command{
-		Use:   "paths",
+		Use:   "path",
 		Short: "Manage escalation paths",
 	}
 

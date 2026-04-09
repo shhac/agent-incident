@@ -31,18 +31,18 @@ Query and manage incident.io incidents, alerts, schedules, escalations, and stat
 
 ### Incident response workflow
 
-1. **What's happening?** `incidents list --status active` to see active incidents
-2. **How bad is it?** `incidents get <id>` for full details including severity and timeline
-3. **What triggered it?** `alerts list --status firing` to see current alerts
-4. **Who's on-call?** `schedules entries <schedule-id> --from now --to now+1h`
-5. **Escalate if needed:** `escalations create --incident <id> --path <path-id>`
-6. **Communicate:** `status-pages incidents create --page <id> --name "..."`
+1. **What's happening?** `incident list --status active` to see active incidents
+2. **How bad is it?** `incident get INC-2000` for full details including severity and timeline
+3. **What triggered it?** `alert list --status firing` to see current alerts
+4. **Who's on-call?** `oncall schedule entries <schedule-id> --from now --to now+1h`
+5. **Escalate if needed:** `oncall escalation create --incident <id> --path <path-id>`
+6. **Communicate:** `status-page update create --page <id> --name "..."`
 
 ### Always read before acting
 
-- Check incident details before editing: `incidents get <id>`
+- Check incident details before editing: `incident get <id>`
 - Check who's already assigned before escalating: look at `incident_role_assignments` in the get response
-- Check current severity levels: `severities list`
+- Check current severity levels: `ref severity list`
 
 ### Error handling
 
@@ -55,36 +55,36 @@ Errors are JSON to stderr with a classification:
 
 ```bash
 # What's happening right now?
-agent-incident incidents list --status active
-agent-incident alerts list --status firing
+agent-incident incident list --status active
+agent-incident alert list --status firing
 
-# Investigate a specific incident
-agent-incident incidents get <id>
-agent-incident incidents updates <id>
+# Investigate a specific incident (accepts INC-2000, 2000, or UUID)
+agent-incident incident get INC-2000
+agent-incident incident updates <id>
 
 # Who's on-call?
-agent-incident schedules list
-agent-incident schedules entries <schedule-id> --from now --to now+1h
+agent-incident oncall schedule list
+agent-incident oncall schedule entries <schedule-id> --from now --to now+1h
 
 # Respond
-agent-incident escalations create --incident <id> --path <path-id>
-agent-incident incidents edit <id> --summary "Root cause identified: ..."
+agent-incident oncall escalation create --incident <id> --path <path-id>
+agent-incident incident edit <id> --summary "Root cause identified: ..."
 
-# Create an incident (use severities list to find valid IDs)
-agent-incident severities list
-agent-incident incidents create --name "API latency spike" --severity <severity-id>
+# Create an incident (use ref severity list to find valid IDs)
+agent-incident ref severity list
+agent-incident incident create --name "API latency spike" --severity <severity-id>
 
 # Override on-call coverage
-agent-incident schedules override <schedule-id> --user <user-id> --from now --to now+4h
+agent-incident oncall schedule override <schedule-id> --user <user-id> --from now --to now+4h
 
 # After resolution
-agent-incident follow-ups list --incident <id>
-agent-incident actions list --incident <id>
+agent-incident follow-up list --incident <id>
+agent-incident action list --incident <id>
 
 # Communicate externally
-agent-incident status-pages list
-agent-incident status-pages incidents create --page <id> --name "Degraded API performance"
-agent-incident status-pages incidents update <sp-inc-id> --status resolved
+agent-incident status-page list
+agent-incident status-page update create --page <id> --name "Degraded API performance"
+agent-incident status-page update update <sp-inc-id> --status resolved
 ```
 
 ## Key Concepts
@@ -96,33 +96,33 @@ agent-incident status-pages incidents update <sp-inc-id> --status resolved
 
 ## Deeper Reference
 
-Per-domain details (only load when the quick reference above isn't enough):
+Per-command details (only load when the quick reference above isn't enough):
 
 ```bash
-agent-incident llm-help               # full command overview, all domains
-agent-incident incidents llm-help     # incident lifecycle, create/edit fields
-agent-incident alerts llm-help        # alert statuses, create alert events
-agent-incident schedules llm-help     # schedule entries, overrides
-agent-incident escalations llm-help   # escalation paths, create escalations
-agent-incident status-pages llm-help  # status page incident management
+agent-incident llm-help                        # full command overview
+agent-incident incident llm-help               # incident lifecycle, create/edit fields
+agent-incident alert llm-help                  # alert statuses, create alert events
+agent-incident oncall schedule llm-help        # schedule entries, overrides
+agent-incident oncall escalation llm-help      # escalation paths, create escalations
+agent-incident status-page llm-help            # status page update management
 ```
 
 ## Discovery Commands
 
 ```bash
 # Reference data (what values are valid?)
-agent-incident severities list        # valid severity levels
-agent-incident statuses list          # valid incident statuses
-agent-incident roles list             # incident roles (lead, comms, etc.)
-agent-incident custom-fields list     # org-specific custom fields
+agent-incident ref severity list              # valid severity levels
+agent-incident ref status list                # valid incident statuses
+agent-incident ref role list                  # incident roles (lead, comms, etc.)
+agent-incident ref custom-field list          # org-specific custom fields
 
 # Service catalog
-agent-incident catalog types list
-agent-incident catalog entries list --type <type-id> --query "checkout"
+agent-incident ref catalog types list
+agent-incident ref catalog entries list --type <type-id> --query "checkout"
 
 # People
-agent-incident users list --query "alice"
-agent-incident escalations paths list
+agent-incident ref user list --query "alice"
+agent-incident oncall escalation path list
 ```
 
 ## Auth Setup

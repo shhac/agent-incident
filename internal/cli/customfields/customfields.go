@@ -11,8 +11,8 @@ import (
 
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:     "custom-fields",
-		Aliases: []string{"customfields"},
+		Use:     "custom-field",
+		Aliases: []string{"customfield"},
 		Short:   "List and inspect custom fields",
 	}
 

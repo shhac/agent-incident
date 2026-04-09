@@ -39,7 +39,7 @@ func allDigits(s string) bool {
 // Register adds the incidents command group to the root command.
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	incidents := &cobra.Command{
-		Use:   "incidents",
+		Use:   "incident",
 		Short: "Manage incidents",
 	}
 
