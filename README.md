@@ -91,6 +91,7 @@ agent-incident
 │   ├── role              list, get
 │   ├── user              list, get
 │   ├── custom-field      list, get
+│   ├── timestamp         list, get
 │   └── catalog
 │       ├── types         list, get
 │       └── entries       list, get

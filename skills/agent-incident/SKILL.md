@@ -24,6 +24,7 @@ Query and manage incident.io incidents, alerts, schedules, escalations, and stat
 - Finding out who's on-call right now
 - Investigating which alerts are firing
 - Escalating an incident to the right responders
+- Editing incident fields: severity, status, custom fields, and timestamps
 - Updating status pages during an incident
 - Reviewing follow-up actions after resolution
 
@@ -69,6 +70,9 @@ agent-incident oncall schedule entries Engineering --from now --to now+1h
 # Respond (--path accepts name or ID)
 agent-incident oncall escalation create --incident <id> --path "Primary Path"
 agent-incident incident edit INC-2000 --summary "Root cause identified: ..."
+agent-incident incident edit INC-2000 --severity SEV2 --status Investigating
+agent-incident incident edit INC-2000 --field "Affected Team=Platform" --field "Root Cause=DNS"
+agent-incident incident edit INC-2000 --timestamp "Resolved at=2026-04-09T15:30:00Z"
 
 # Create an incident (use ref severity list to find valid IDs)
 agent-incident ref severity list
@@ -92,7 +96,7 @@ agent-incident status-page update update <sp-inc-id> --status resolved
 - **Time formats**: relative (`now-15m`, `now-1h`, `now+1h`), RFC3339, or unix epoch
 - **Output**: NDJSON for lists (one object per line), JSON for single items. `--full` for complete API response. `--format json|yaml|jsonl` to override
 - **Compact mode**: List commands omit large fields (description, custom fields, timestamps) by default. Use `--full` to include everything
-- **Name resolution**: Schedule, escalation path, status page, and user arguments accept names (case-insensitive, substring match). If the value looks like a ULID it's used as-is; otherwise a list lookup resolves the name to an ID. Ambiguous matches error with options listed.
+- **Name resolution**: Schedule, escalation path, status page, user, severity, status, custom field, timestamp, and catalog entry arguments accept names (case-insensitive, substring match). If the value looks like a ULID it's used as-is; otherwise a list lookup resolves the name to an ID. Ambiguous matches error with options listed.
 - **Pagination**: `--limit N` controls page size, `--after <cursor>` for next page. Cursor is returned in `@pagination` NDJSON line
 
 ## Deeper Reference
@@ -116,6 +120,7 @@ agent-incident ref severity list              # valid severity levels
 agent-incident ref status list                # valid incident statuses
 agent-incident ref role list                  # incident roles (lead, comms, etc.)
 agent-incident ref custom-field list          # org-specific custom fields
+agent-incident ref timestamp list             # timestamp definitions (Reported at, Resolved at, etc.)
 
 # Service catalog
 agent-incident ref catalog types list

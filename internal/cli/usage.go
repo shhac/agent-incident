@@ -29,7 +29,7 @@ INCIDENTS (triage starting point)
   agent-incident incident list [--status <status>] [--severity <sev>] [--since <time>] [--full]
   agent-incident incident get <id-or-reference>       # accepts INC-2000, 2000, or UUID
   agent-incident incident create --name <text> --severity <sev-id> [--summary <text>]
-  agent-incident incident edit <id> [--name <text>] [--severity <sev-id>] [--summary <text>]
+  agent-incident incident edit <id> [--name <text>] [--severity <name-or-id>] [--status <name-or-id>] [--summary <text>] [--field "Name=value"] [--timestamp "Name=time"]
   agent-incident incident updates <id>
 
 ALERTS
@@ -67,6 +67,7 @@ REFERENCE DATA
   agent-incident ref role list / get <id>
   agent-incident ref user list [--query <text>] [--full] / get <id>
   agent-incident ref custom-field list / get <id>
+  agent-incident ref timestamp list / get <id>
   agent-incident ref catalog types list / get <id>
   agent-incident ref catalog entries list [--type <id>] [--query <text>] / get <id>
 
