@@ -16,11 +16,20 @@ type Schedule struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+type ScheduleEntryUser struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	Role        string `json:"role"`
+	SlackUserID string `json:"slack_user_id,omitempty"`
+}
+
 type ScheduleEntry struct {
-	ScheduleID string            `json:"schedule_id"`
-	User       map[string]string `json:"user"`
-	StartAt    string            `json:"start_at"`
-	EndAt      string            `json:"end_at"`
+	RotationID  string            `json:"rotation_id,omitempty"`
+	Fingerprint string            `json:"fingerprint,omitempty"`
+	User        ScheduleEntryUser `json:"user"`
+	StartAt     string            `json:"start_at"`
+	EndAt       string            `json:"end_at"`
 }
 
 type ScheduleOverrideParams struct {
@@ -46,8 +55,14 @@ type scheduleWrapper struct {
 	Schedule Schedule `json:"schedule"`
 }
 
+type scheduleEntriesGroup struct {
+	Final     []ScheduleEntry `json:"final"`
+	Overrides []ScheduleEntry `json:"overrides"`
+	Scheduled []ScheduleEntry `json:"scheduled"`
+}
+
 type scheduleEntriesWrapper struct {
-	ScheduleEntries []ScheduleEntry `json:"schedule_entries"`
+	ScheduleEntries scheduleEntriesGroup `json:"schedule_entries"`
 }
 
 type scheduleOverrideWrapper struct {
@@ -79,7 +94,7 @@ func (c *Client) ListScheduleEntries(ctx context.Context, scheduleID string, fro
 	if err != nil {
 		return nil, err
 	}
-	return resp.ScheduleEntries, nil
+	return resp.ScheduleEntries.Final, nil
 }
 
 func (c *Client) CreateScheduleOverride(ctx context.Context, params ScheduleOverrideParams) (*ScheduleOverride, error) {

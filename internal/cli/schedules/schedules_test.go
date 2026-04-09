@@ -88,12 +88,25 @@ func TestSchedulesEntries(t *testing.T) {
 		gotMethod = r.Method
 		gotQuery = r.URL.Query()
 		json.NewEncoder(w).Encode(map[string]any{
-			"schedule_entries": []api.ScheduleEntry{
-				{
-					ScheduleID: "sched-1",
-					User:       map[string]string{"id": "user-1", "name": "Alice"},
-					StartAt:    "2026-04-09T08:00:00Z",
-					EndAt:      "2026-04-09T16:00:00Z",
+			"schedule_entries": map[string]any{
+				"final": []api.ScheduleEntry{
+					{
+						RotationID:  "rot-1",
+						Fingerprint: "abc123",
+						User:        api.ScheduleEntryUser{ID: "user-1", Name: "Alice", Email: "alice@example.com", Role: "responder"},
+						StartAt:     "2026-04-09T08:00:00Z",
+						EndAt:       "2026-04-09T16:00:00Z",
+					},
+				},
+				"overrides": []api.ScheduleEntry{},
+				"scheduled": []api.ScheduleEntry{
+					{
+						RotationID:  "rot-1",
+						Fingerprint: "abc123",
+						User:        api.ScheduleEntryUser{ID: "user-1", Name: "Alice", Email: "alice@example.com", Role: "responder"},
+						StartAt:     "2026-04-09T08:00:00Z",
+						EndAt:       "2026-04-09T16:00:00Z",
+					},
 				},
 			},
 		})
