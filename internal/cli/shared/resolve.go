@@ -72,6 +72,8 @@ func ResolveStatusPageID(ctx context.Context, client *api.Client, ref string) (s
 }
 
 // ResolveUserID resolves a user name, email, or ID to an ID.
+// Uses server-side search, then applies the same exact→substring→ambiguous→not-found
+// flow as matchByName, but matches on both name and email for the exact pass.
 func ResolveUserID(ctx context.Context, client *api.Client, ref string) (string, error) {
 	if looksLikeID(ref) {
 		return ref, nil
@@ -82,35 +84,37 @@ func ResolveUserID(ctx context.Context, client *api.Client, ref string) (string,
 	}
 
 	lower := strings.ToLower(ref)
-	var exact []api.User
+	var exactMatches, substringMatches []api.User
 	for _, u := range users {
-		if strings.ToLower(u.Name) == lower || strings.ToLower(u.Email) == lower {
-			exact = append(exact, u)
+		nameLower := strings.ToLower(u.Name)
+		emailLower := strings.ToLower(u.Email)
+		if nameLower == lower || emailLower == lower {
+			exactMatches = append(exactMatches, u)
+		} else if strings.Contains(nameLower, lower) || strings.Contains(emailLower, lower) {
+			substringMatches = append(substringMatches, u)
 		}
 	}
 
-	if len(exact) == 1 {
-		return exact[0].ID, nil
-	}
-	if len(exact) > 1 {
-		names := make([]string, len(exact))
-		for i, u := range exact {
-			names[i] = fmt.Sprintf("%s <%s>", u.Name, u.Email)
-		}
-		return "", ambiguousError("user", ref, names)
-	}
-
-	if len(users) == 1 {
-		return users[0].ID, nil
-	}
-	if len(users) > 1 {
+	formatUser := func(users []api.User) []string {
 		names := make([]string, len(users))
 		for i, u := range users {
 			names[i] = fmt.Sprintf("%s <%s>", u.Name, u.Email)
 		}
-		return "", ambiguousError("user", ref, names)
+		return names
 	}
 
+	if len(exactMatches) == 1 {
+		return exactMatches[0].ID, nil
+	}
+	if len(exactMatches) > 1 {
+		return "", ambiguousError("user", ref, formatUser(exactMatches))
+	}
+	if len(substringMatches) == 1 {
+		return substringMatches[0].ID, nil
+	}
+	if len(substringMatches) > 1 {
+		return "", ambiguousError("user", ref, formatUser(substringMatches))
+	}
 	return "", notFoundError("user", ref)
 }
 
