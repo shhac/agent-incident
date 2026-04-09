@@ -11,12 +11,7 @@ triggers:
   - schedule
   - pager
   - follow-up
-tools:
-  allowed:
-    - Bash
-    - Read
-    - Grep
-    - Glob
+allowed-tools: Bash Read Grep Glob
 ---
 
 # agent-incident — incident.io Triage CLI
@@ -61,7 +56,6 @@ Errors are JSON to stderr with a classification:
 ```bash
 # What's happening right now?
 agent-incident incidents list --status active
-agent-incident incidents list --severity critical
 agent-incident alerts list --status firing
 
 # Investigate a specific incident
@@ -74,11 +68,14 @@ agent-incident schedules entries <schedule-id> --from now --to now+1h
 
 # Respond
 agent-incident escalations create --incident <id> --path <path-id>
-agent-incident incidents edit <id> --severity critical
 agent-incident incidents edit <id> --summary "Root cause identified: ..."
 
-# Create an incident
-agent-incident incidents create --name "API latency spike" --severity critical
+# Create an incident (use severities list to find valid IDs)
+agent-incident severities list
+agent-incident incidents create --name "API latency spike" --severity <severity-id>
+
+# Override on-call coverage
+agent-incident schedules override <schedule-id> --user <user-id> --from now --to now+4h
 
 # After resolution
 agent-incident follow-ups list --incident <id>
