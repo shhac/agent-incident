@@ -70,20 +70,13 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
 
-			var createdAfter, createdBefore string
-			if from != "" {
-				t, err := shared.ParseTime(from)
-				if err != nil {
-					return err
-				}
-				createdAfter = t.Format("2006-01-02")
+			createdAfter, err := shared.ParseDateFlag(from)
+			if err != nil {
+				return err
 			}
-			if to != "" {
-				t, err := shared.ParseTime(to)
-				if err != nil {
-					return err
-				}
-				createdBefore = t.Format("2006-01-02")
+			createdBefore, err := shared.ParseDateFlag(to)
+			if err != nil {
+				return err
 			}
 
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {

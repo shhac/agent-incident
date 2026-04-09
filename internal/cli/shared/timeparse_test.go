@@ -174,3 +174,35 @@ func TestParseTimeRangeInvalidTo(t *testing.T) {
 		t.Fatal("expected error for invalid to")
 	}
 }
+
+func TestParseDateFlag(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"", ""},
+		{"2024-06-15T10:30:00Z", "2024-06-15"},
+		{"now-1d", ""},  // relative — just check no error
+	}
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got, err := ParseDateFlag(tt.input)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if tt.want != "" && got != tt.want {
+				t.Errorf("ParseDateFlag(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+			if tt.input != "" && got == "" {
+				t.Errorf("ParseDateFlag(%q) returned empty string", tt.input)
+			}
+		})
+	}
+}
+
+func TestParseDateFlagInvalid(t *testing.T) {
+	_, err := ParseDateFlag("not-a-date")
+	if err == nil {
+		t.Fatal("expected error for invalid date")
+	}
+}

@@ -83,6 +83,19 @@ func parseRelativeTime(s string) (time.Time, error) {
 	return now.Add(sign * duration), nil
 }
 
+// ParseDateFlag parses a time string and formats it as yyyy-mm-dd.
+// Returns empty string if the input is empty.
+func ParseDateFlag(s string) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+	t, err := ParseTime(s)
+	if err != nil {
+		return "", err
+	}
+	return t.Format("2006-01-02"), nil
+}
+
 // ParseTimeDefaultFrom returns the parsed --from time, defaulting to 1 hour ago.
 func ParseTimeDefaultFrom(s string) (time.Time, error) {
 	if s == "" {
