@@ -1,0 +1,284 @@
+{
+  "incidents": [
+    {
+      "call_url": "https://meet.example.com/abc-defg-hij",
+      "created_at": "2025-03-15T14:30:00.000Z",
+      "creator": {
+        "user": {
+          "email": "jane.smith@acmecorp.com",
+          "id": "01USER0JANESMITHAAAAAAAAAAA",
+          "name": "Jane Smith",
+          "role": "responder",
+          "slack_user_id": "U0FAKE01AAA"
+        }
+      },
+      "custom_field_entries": [
+        {
+          "custom_field": {
+            "description": "The team responsible for this incident",
+            "field_type": "multi_select",
+            "id": "01CF00TEAMAAAAAAAAAAAAAAAA",
+            "name": "Team",
+            "options": []
+          },
+          "values": [
+            {
+              "value_catalog_entry": {
+                "id": "01CAT0PLATFORMAAAAAAAAAAAAA",
+                "name": "Platform Engineering"
+              }
+            }
+          ]
+        },
+        {
+          "custom_field": {
+            "description": "Affected product area",
+            "field_type": "multi_select",
+            "id": "01CF00PRODAREAAAAAAAAAAAAAAA",
+            "name": "Product Area",
+            "options": []
+          },
+          "values": [
+            {
+              "value_catalog_entry": {
+                "external_id": "payments",
+                "id": "01CAT0PAYMENTSAAAAAAAAAAAAA",
+                "name": "Payments"
+              }
+            }
+          ]
+        }
+      ],
+      "duration_metrics": [
+        {
+          "duration_metric": {
+            "id": "01DM00DURATIONAAAAAAAAAAAAA",
+            "name": "Incident duration"
+          },
+          "value_seconds": 3600
+        },
+        {
+          "duration_metric": {
+            "id": "01DM00MITIGATEAAAAAAAAAAAAA",
+            "name": "Time to Mitigate"
+          },
+          "value_seconds": 1800
+        }
+      ],
+      "has_debrief": true,
+      "id": "01INC0ALPHAAAAAAAAAAAAAAAA",
+      "incident_role_assignments": [
+        {
+          "assignee": {
+            "email": "jane.smith@acmecorp.com",
+            "id": "01USER0JANESMITHAAAAAAAAAAA",
+            "name": "Jane Smith",
+            "role": "responder",
+            "slack_user_id": "U0FAKE01AAA"
+          },
+          "role": {
+            "created_at": "2024-02-01T09:00:00.000Z",
+            "description": "The person coordinating the incident response.",
+            "id": "01ROLE0LEADAAAAAAAAAAAAAAA",
+            "instructions": "Coordinate response and communicate status.",
+            "name": "Incident Lead",
+            "role_type": "lead",
+            "shortform": "lead",
+            "updated_at": "2024-08-10T11:00:00.000Z"
+          }
+        }
+      ],
+      "incident_status": {
+        "category": "closed",
+        "created_at": "2024-01-10T08:03:00.000Z",
+        "description": "Incident resolved and verified.",
+        "id": "01STAT0CLOSEDAAAAAAAAAAAAAA",
+        "name": "Closed",
+        "rank": 3,
+        "updated_at": "2024-05-20T14:00:00.000Z"
+      },
+      "incident_timestamp_values": [
+        {
+          "incident_timestamp": {
+            "id": "01TS00REPORTEDAAAAAAAAAAAAA",
+            "name": "Reported at",
+            "rank": 0
+          },
+          "value": {
+            "value": "2025-03-15T14:30:00.000Z"
+          }
+        },
+        {
+          "incident_timestamp": {
+            "id": "01TS00RESOLVEDAAAAAAAAAAAAA",
+            "name": "Resolved at",
+            "rank": 5
+          },
+          "value": {
+            "value": "2025-03-15T15:30:00.000Z"
+          }
+        }
+      ],
+      "incident_type": {
+        "create_in_triage": "optional",
+        "created_at": "2024-01-05T09:00:00.000Z",
+        "description": "Default incident type for production issues",
+        "id": "01TYPE0DEFAULTAAAAAAAAAAAAA",
+        "is_default": true,
+        "name": "Production Incident",
+        "private_incidents_only": false,
+        "updated_at": "2024-06-01T10:00:00.000Z"
+      },
+      "mode": "standard",
+      "name": "API Gateway Outage",
+      "permalink": "https://app.incident.io/acme-corp/incidents/01INC0ALPHAAAAAAAAAAAAAAAA",
+      "reference": "INC-101",
+      "severity": {
+        "created_at": "2024-01-15T10:00:00.000Z",
+        "description": "Company-ending event. All hands on deck immediately.",
+        "id": "01AAAAAAAAAAAAAAAAAAAAAAAA",
+        "name": "SEV-Critical",
+        "rank": 0,
+        "updated_at": "2024-06-01T12:00:00.000Z"
+      },
+      "slack_channel_id": "C0FAKEAAA01",
+      "slack_channel_name": "inc-2025-03-15-api-gateway-outage",
+      "slack_team_id": "T0FAKETEAM1",
+      "summary": "The API gateway stopped routing traffic to backend services due to a misconfigured rate limit rule deployed at 14:25 UTC. All external API consumers received 503 errors for approximately 60 minutes until the configuration was rolled back.",
+      "updated_at": "2025-03-15T16:00:00.000Z",
+      "visibility": "public",
+      "workload_minutes_late": 0,
+      "workload_minutes_sleeping": 0,
+      "workload_minutes_total": 120.5,
+      "workload_minutes_working": 120.5
+    },
+    {
+      "call_url": "",
+      "created_at": "2025-03-18T09:15:00.000Z",
+      "creator": {
+        "user": {
+          "email": "bob.jones@acmecorp.com",
+          "id": "01USER0BOBJONESAAAAAAAAAAAAA",
+          "name": "Bob Jones",
+          "role": "responder",
+          "slack_user_id": "U0FAKE02BBB"
+        }
+      },
+      "custom_field_entries": [
+        {
+          "custom_field": {
+            "description": "The team responsible for this incident",
+            "field_type": "multi_select",
+            "id": "01CF00TEAMAAAAAAAAAAAAAAAA",
+            "name": "Team",
+            "options": []
+          },
+          "values": [
+            {
+              "value_catalog_entry": {
+                "id": "01CAT0DATATEAMAAAAAAAAAAAAA",
+                "name": "Data Engineering"
+              }
+            }
+          ]
+        }
+      ],
+      "duration_metrics": [
+        {
+          "duration_metric": {
+            "id": "01DM00DURATIONAAAAAAAAAAAAA",
+            "name": "Incident duration"
+          }
+        }
+      ],
+      "has_debrief": false,
+      "id": "01INC0BETAAAAAAAAAAAAAAAAAAA",
+      "incident_role_assignments": [
+        {
+          "assignee": {
+            "email": "bob.jones@acmecorp.com",
+            "id": "01USER0BOBJONESAAAAAAAAAAAAA",
+            "name": "Bob Jones",
+            "role": "responder",
+            "slack_user_id": "U0FAKE02BBB"
+          },
+          "role": {
+            "created_at": "2024-02-01T09:00:00.000Z",
+            "description": "The person coordinating the incident response.",
+            "id": "01ROLE0LEADAAAAAAAAAAAAAAA",
+            "instructions": "Coordinate response and communicate status.",
+            "name": "Incident Lead",
+            "role_type": "lead",
+            "shortform": "lead",
+            "updated_at": "2024-08-10T11:00:00.000Z"
+          }
+        }
+      ],
+      "incident_status": {
+        "category": "live",
+        "created_at": "2024-01-10T08:01:00.000Z",
+        "description": "Actively working to identify root cause.",
+        "id": "01STAT0INVESTAAAAAAAAAAAAAA",
+        "name": "Investigating",
+        "rank": 1,
+        "updated_at": "2024-03-15T09:30:00.000Z"
+      },
+      "incident_timestamp_values": [
+        {
+          "incident_timestamp": {
+            "id": "01TS00REPORTEDAAAAAAAAAAAAA",
+            "name": "Reported at",
+            "rank": 0
+          },
+          "value": {
+            "value": "2025-03-18T09:15:00.000Z"
+          }
+        },
+        {
+          "incident_timestamp": {
+            "id": "01TS00RESOLVEDAAAAAAAAAAAAA",
+            "name": "Resolved at",
+            "rank": 5
+          }
+        }
+      ],
+      "incident_type": {
+        "create_in_triage": "optional",
+        "created_at": "2024-01-05T09:00:00.000Z",
+        "description": "Default incident type for production issues",
+        "id": "01TYPE0DEFAULTAAAAAAAAAAAAA",
+        "is_default": true,
+        "name": "Production Incident",
+        "private_incidents_only": false,
+        "updated_at": "2024-06-01T10:00:00.000Z"
+      },
+      "mode": "standard",
+      "name": "Database Replication Lag Spike",
+      "permalink": "https://app.incident.io/acme-corp/incidents/01INC0BETAAAAAAAAAAAAAAAAAAA",
+      "reference": "INC-102",
+      "severity": {
+        "created_at": "2024-01-15T10:01:00.000Z",
+        "description": "Major customer impact. Wake the on-call team.",
+        "id": "01BBBBBBBBBBBBBBBBBBBBBBBB",
+        "name": "SEV-High",
+        "rank": 1,
+        "updated_at": "2024-06-01T12:01:00.000Z"
+      },
+      "slack_channel_id": "C0FAKEBBB02",
+      "slack_channel_name": "inc-2025-03-18-database-replication-lag-spike",
+      "slack_team_id": "T0FAKETEAM1",
+      "summary": "Replication lag on the primary PostgreSQL cluster exceeded 30 seconds, causing stale reads for users on read replicas. The data pipeline team is investigating whether a long-running migration triggered the lag.",
+      "updated_at": "2025-03-18T10:45:00.000Z",
+      "visibility": "public",
+      "workload_minutes_late": 0,
+      "workload_minutes_sleeping": 0,
+      "workload_minutes_total": 90.0,
+      "workload_minutes_working": 90.0
+    }
+  ],
+  "pagination_meta": {
+    "after": "01INC0BETAAAAAAAAAAAAAAAAAAA",
+    "page_size": 2,
+    "total_record_count": 47
+  }
+}

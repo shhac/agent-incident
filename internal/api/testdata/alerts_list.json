@@ -1,0 +1,158 @@
+{
+  "alerts": [
+    {
+      "alert_source_id": "01ASRC0DATADOGAAAAAAAAAAAAA",
+      "attributes": [
+        {
+          "attribute": {
+            "array": false,
+            "id": "01ATTR0PRIORITYAAAAAAAAAAAA",
+            "name": "Priority",
+            "required": false,
+            "type": "AlertPriority"
+          },
+          "value": {
+            "label": "P1",
+            "literal": "01PRIO0P1AAAAAAAAAAAAAAAAAAA"
+          }
+        },
+        {
+          "attribute": {
+            "array": false,
+            "emoji": "",
+            "id": "01ATTR0SEVERITYAAAAAAAAAAAA",
+            "name": "Severity",
+            "required": false,
+            "type": "String"
+          },
+          "value": {
+            "label": "critical",
+            "literal": "critical"
+          }
+        },
+        {
+          "attribute": {
+            "array": false,
+            "emoji": "",
+            "id": "01ATTR0SERVICEAAAAAAAAAAAAA",
+            "name": "Service",
+            "required": false,
+            "type": "CatalogEntry[\"PagerDutyService\"]"
+          }
+        },
+        {
+          "attribute": {
+            "array": false,
+            "emoji": "",
+            "id": "01ATTR0ALERTTYPEAAAAAAAAAAA",
+            "name": "Alert type",
+            "required": false,
+            "type": "String"
+          },
+          "value": {
+            "label": "error",
+            "literal": "error"
+          }
+        },
+        {
+          "attribute": {
+            "array": false,
+            "emoji": "",
+            "id": "01ATTR0LABELSAAAAAAAAAAAAA",
+            "name": "Labels",
+            "required": false,
+            "type": "Labels"
+          }
+        }
+      ],
+      "created_at": "2025-03-15T14:25:00.000Z",
+      "deduplication_key": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+      "description": "API Gateway error rate exceeded threshold. 5xx responses at 45% over the last 5 minutes.\n\nMonitor: https://monitoring.example.com/monitors/12345\nDashboard: https://monitoring.example.com/dashboard/api-gateway",
+      "id": "01ALRT0GATEWAYAAAAAAAAAAAAA",
+      "resolved_at": "2025-03-15T15:30:00.000Z",
+      "source_url": "https://monitoring.example.com/event/evt-001",
+      "status": "resolved",
+      "title": "[Critical] API Gateway 5xx error rate exceeded 40%",
+      "updated_at": "2025-03-15T15:30:00.123Z"
+    },
+    {
+      "alert_source_id": "01ASRC0DATADOGAAAAAAAAAAAAA",
+      "attributes": [
+        {
+          "attribute": {
+            "array": false,
+            "id": "01ATTR0PRIORITYAAAAAAAAAAAA",
+            "name": "Priority",
+            "required": false,
+            "type": "AlertPriority"
+          },
+          "value": {
+            "label": "P2",
+            "literal": "01PRIO0P2AAAAAAAAAAAAAAAAAAA"
+          }
+        },
+        {
+          "attribute": {
+            "array": false,
+            "emoji": "",
+            "id": "01ATTR0SEVERITYAAAAAAAAAAAA",
+            "name": "Severity",
+            "required": false,
+            "type": "String"
+          },
+          "value": {
+            "label": "warning",
+            "literal": "warning"
+          }
+        },
+        {
+          "attribute": {
+            "array": false,
+            "emoji": "",
+            "id": "01ATTR0SERVICEAAAAAAAAAAAAA",
+            "name": "Service",
+            "required": false,
+            "type": "CatalogEntry[\"PagerDutyService\"]"
+          }
+        },
+        {
+          "attribute": {
+            "array": false,
+            "emoji": "",
+            "id": "01ATTR0ALERTTYPEAAAAAAAAAAA",
+            "name": "Alert type",
+            "required": false,
+            "type": "String"
+          },
+          "value": {
+            "label": "warning",
+            "literal": "warning"
+          }
+        },
+        {
+          "attribute": {
+            "array": false,
+            "emoji": "",
+            "id": "01ATTR0LABELSAAAAAAAAAAAAA",
+            "name": "Labels",
+            "required": false,
+            "type": "Labels"
+          }
+        }
+      ],
+      "created_at": "2025-03-18T09:10:00.000Z",
+      "deduplication_key": "f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3",
+      "description": "Database replication lag on primary PostgreSQL cluster has exceeded 30s threshold.\n\nCluster: acme-prod-primary\nCurrent lag: 45s\nThreshold: 30s",
+      "id": "01ALRT0DBLAGAAAAAAAAAAAAAA",
+      "resolved_at": null,
+      "source_url": "https://monitoring.example.com/event/evt-002",
+      "status": "firing",
+      "title": "[Warning] PostgreSQL replication lag exceeds 30s on acme-prod-primary",
+      "updated_at": "2025-03-18T09:20:00.000Z"
+    }
+  ],
+  "pagination_meta": {
+    "after": "01ALRT0DBLAGAAAAAAAAAAAAAA",
+    "page_size": 2
+  }
+}

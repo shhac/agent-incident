@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "name": "ACME Corp Production",
+    "roles": [
+      "viewer",
+      "incident_creator"
+    ],
+    "actor": {
+      "type": "api_key",
+      "id": "01APIKEY0ACMEAAAAAAAAAAAAA"
+    }
+  }
+}

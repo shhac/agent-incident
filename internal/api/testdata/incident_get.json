@@ -1,0 +1,314 @@
+{
+  "incident": {
+    "call_url": "https://meet.example.com/abc-defg-hij",
+    "created_at": "2025-03-15T14:30:00.000Z",
+    "creator": {
+      "user": {
+        "email": "jane.smith@acmecorp.com",
+        "id": "01USER0JANESMITHAAAAAAAAAAA",
+        "name": "Jane Smith",
+        "role": "responder",
+        "slack_user_id": "U0FAKE01AAA"
+      }
+    },
+    "custom_field_entries": [
+      {
+        "custom_field": {
+          "description": "The team responsible for this incident",
+          "field_type": "multi_select",
+          "id": "01CF00TEAMAAAAAAAAAAAAAAAA",
+          "name": "Team",
+          "options": []
+        },
+        "values": [
+          {
+            "value_catalog_entry": {
+              "id": "01CAT0PLATFORMAAAAAAAAAAAAA",
+              "name": "Platform Engineering"
+            }
+          }
+        ]
+      },
+      {
+        "custom_field": {
+          "description": "Affected product area",
+          "field_type": "multi_select",
+          "id": "01CF00PRODAREAAAAAAAAAAAAAAA",
+          "name": "Product Area",
+          "options": []
+        },
+        "values": [
+          {
+            "value_catalog_entry": {
+              "external_id": "payments",
+              "id": "01CAT0PAYMENTSAAAAAAAAAAAAA",
+              "name": "Payments"
+            }
+          }
+        ]
+      },
+      {
+        "custom_field": {
+          "description": "Services impacted by the incident",
+          "field_type": "multi_select",
+          "id": "01CF00SERVICESAAAAAAAAAAAAA",
+          "name": "Services",
+          "options": [
+            {
+              "custom_field_id": "01CF00SERVICESAAAAAAAAAAAAA",
+              "id": "01OPT0GATEWAYAAAAAAAAAAAAA",
+              "sort_key": 10,
+              "value": "api-gateway"
+            },
+            {
+              "custom_field_id": "01CF00SERVICESAAAAAAAAAAAAA",
+              "id": "01OPT0PAYMENTAAAAAAAAAAAAA",
+              "sort_key": 20,
+              "value": "payment-service"
+            },
+            {
+              "custom_field_id": "01CF00SERVICESAAAAAAAAAAAAA",
+              "id": "01OPT0USERSVCAAAAAAAAAAAAA",
+              "sort_key": 30,
+              "value": "user-service"
+            }
+          ],
+          "values": [
+            {
+              "value_option": {
+                "custom_field_id": "01CF00SERVICESAAAAAAAAAAAAA",
+                "id": "01OPT0GATEWAYAAAAAAAAAAAAA",
+                "sort_key": 10,
+                "value": "api-gateway"
+              }
+            },
+            {
+              "value_option": {
+                "custom_field_id": "01CF00SERVICESAAAAAAAAAAAAA",
+                "id": "01OPT0PAYMENTAAAAAAAAAAAAA",
+                "sort_key": 20,
+                "value": "payment-service"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "custom_field": {
+          "description": "Root cause category",
+          "field_type": "single_select",
+          "id": "01CF00CAUSEAAAAAAAAAAAAAAAAA",
+          "name": "Cause",
+          "options": [
+            {
+              "custom_field_id": "01CF00CAUSEAAAAAAAAAAAAAAAAA",
+              "id": "01OPT0CONFIGAAAAAAAAAAAAAAAA",
+              "sort_key": 10,
+              "value": "Configuration Change"
+            },
+            {
+              "custom_field_id": "01CF00CAUSEAAAAAAAAAAAAAAAAA",
+              "id": "01OPT0CODEBUGAAAAAAAAAAAAAAA",
+              "sort_key": 20,
+              "value": "Code Bug"
+            }
+          ],
+          "values": [
+            {
+              "value_option": {
+                "custom_field_id": "01CF00CAUSEAAAAAAAAAAAAAAAAA",
+                "id": "01OPT0CONFIGAAAAAAAAAAAAAAAA",
+                "sort_key": 10,
+                "value": "Configuration Change"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "duration_metrics": [
+      {
+        "duration_metric": {
+          "id": "01DM00DURATIONAAAAAAAAAAAAA",
+          "name": "Incident duration"
+        },
+        "value_seconds": 3600
+      },
+      {
+        "duration_metric": {
+          "id": "01DM00MITIGATEAAAAAAAAAAAAA",
+          "name": "Time to Mitigate"
+        },
+        "value_seconds": 1800
+      }
+    ],
+    "has_debrief": true,
+    "id": "01INC0ALPHAAAAAAAAAAAAAAAA",
+    "incident_role_assignments": [
+      {
+        "assignee": {
+          "email": "jane.smith@acmecorp.com",
+          "id": "01USER0JANESMITHAAAAAAAAAAA",
+          "name": "Jane Smith",
+          "role": "responder",
+          "slack_user_id": "U0FAKE01AAA"
+        },
+        "role": {
+          "created_at": "2024-02-01T09:00:00.000Z",
+          "description": "The person coordinating the incident response.",
+          "id": "01ROLE0LEADAAAAAAAAAAAAAAA",
+          "instructions": "Coordinate response and communicate status.",
+          "name": "Incident Lead",
+          "role_type": "lead",
+          "shortform": "lead",
+          "updated_at": "2024-08-10T11:00:00.000Z"
+        }
+      },
+      {
+        "assignee": {
+          "email": "alice.wong@acmecorp.com",
+          "id": "01USER0ALICEWONGAAAAAAAAAA",
+          "name": "Alice Wong",
+          "role": "responder",
+          "slack_user_id": "U0FAKE03CCC"
+        },
+        "role": {
+          "created_at": "2024-02-01T09:01:00.000Z",
+          "description": "The person who first reported the incident.",
+          "id": "01ROLE0REPORTAAAAAAAAAAAAA",
+          "instructions": "",
+          "name": "Reporter",
+          "role_type": "reporter",
+          "shortform": "",
+          "updated_at": "2024-08-10T11:01:00.000Z"
+        }
+      },
+      {
+        "assignee": {
+          "email": "bob.jones@acmecorp.com",
+          "id": "01USER0BOBJONESAAAAAAAAAAAAA",
+          "name": "Bob Jones",
+          "role": "responder",
+          "slack_user_id": "U0FAKE02BBB"
+        },
+        "role": {
+          "created_at": "2024-02-01T09:02:00.000Z",
+          "description": "Handles external communications.",
+          "id": "01ROLE0COMMSAAAAAAAAAAAAAAA",
+          "instructions": "Draft and send customer-facing updates.",
+          "name": "Communications Lead",
+          "role_type": "custom",
+          "shortform": "comms",
+          "updated_at": "2024-08-10T11:02:00.000Z"
+        }
+      }
+    ],
+    "incident_status": {
+      "category": "closed",
+      "created_at": "2024-01-10T08:03:00.000Z",
+      "description": "Incident resolved and verified.",
+      "id": "01STAT0CLOSEDAAAAAAAAAAAAAA",
+      "name": "Closed",
+      "rank": 3,
+      "updated_at": "2024-05-20T14:00:00.000Z"
+    },
+    "incident_timestamp_values": [
+      {
+        "incident_timestamp": {
+          "id": "01TS00REPORTEDAAAAAAAAAAAAA",
+          "name": "Reported at",
+          "rank": 0
+        },
+        "value": {
+          "value": "2025-03-15T14:30:00.000Z"
+        }
+      },
+      {
+        "incident_timestamp": {
+          "id": "01TS00ACCEPTEDAAAAAAAAAAAAA",
+          "name": "Accepted at",
+          "rank": 1
+        },
+        "value": {
+          "value": "2025-03-15T14:32:00.000Z"
+        }
+      },
+      {
+        "incident_timestamp": {
+          "id": "01TS00DECLINEDAAAAAAAAAAAAA",
+          "name": "Declined at",
+          "rank": 2
+        }
+      },
+      {
+        "incident_timestamp": {
+          "id": "01TS00MITIGATEDAAAAAAAAAAAA",
+          "name": "Mitigated at",
+          "rank": 3
+        },
+        "value": {
+          "value": "2025-03-15T15:00:00.000Z"
+        }
+      },
+      {
+        "incident_timestamp": {
+          "id": "01TS00CANCELEDAAAAAAAAAAAAA",
+          "name": "Canceled at",
+          "rank": 4
+        }
+      },
+      {
+        "incident_timestamp": {
+          "id": "01TS00RESOLVEDAAAAAAAAAAAAA",
+          "name": "Resolved at",
+          "rank": 5
+        },
+        "value": {
+          "value": "2025-03-15T15:30:00.000Z"
+        }
+      },
+      {
+        "incident_timestamp": {
+          "id": "01TS00FIXEDATAAAAAAAAAAAAA",
+          "name": "Fixed at",
+          "rank": 105
+        },
+        "value": {
+          "value": "2025-03-15T15:15:00.000Z"
+        }
+      }
+    ],
+    "incident_type": {
+      "create_in_triage": "optional",
+      "created_at": "2024-01-05T09:00:00.000Z",
+      "description": "Default incident type for production issues",
+      "id": "01TYPE0DEFAULTAAAAAAAAAAAAA",
+      "is_default": true,
+      "name": "Production Incident",
+      "private_incidents_only": false,
+      "updated_at": "2024-06-01T10:00:00.000Z"
+    },
+    "mode": "standard",
+    "name": "API Gateway Outage",
+    "permalink": "https://app.incident.io/acme-corp/incidents/01INC0ALPHAAAAAAAAAAAAAAAA",
+    "reference": "INC-101",
+    "severity": {
+      "created_at": "2024-01-15T10:00:00.000Z",
+      "description": "Company-ending event. All hands on deck immediately.",
+      "id": "01AAAAAAAAAAAAAAAAAAAAAAAA",
+      "name": "SEV-Critical",
+      "rank": 0,
+      "updated_at": "2024-06-01T12:00:00.000Z"
+    },
+    "slack_channel_id": "C0FAKEAAA01",
+    "slack_channel_name": "inc-2025-03-15-api-gateway-outage",
+    "slack_team_id": "T0FAKETEAM1",
+    "summary": "The API gateway stopped routing traffic to backend services due to a misconfigured rate limit rule deployed at 14:25 UTC. All external API consumers received 503 errors for approximately 60 minutes until the configuration was rolled back. Root cause was a typo in the rate limit threshold that set it to 1 req/s instead of 10000 req/s.",
+    "updated_at": "2025-03-15T16:00:00.000Z",
+    "visibility": "public",
+    "workload_minutes_late": 0,
+    "workload_minutes_sleeping": 0,
+    "workload_minutes_total": 120.5,
+    "workload_minutes_working": 120.5
+  }
+}

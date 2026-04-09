@@ -1,0 +1,28 @@
+{
+  "severities": [
+    {
+      "created_at": "2024-01-15T10:00:00.000Z",
+      "description": "Company-ending event. All hands on deck immediately.",
+      "id": "01AAAAAAAAAAAAAAAAAAAAAAAA",
+      "name": "SEV-Critical",
+      "rank": 0,
+      "updated_at": "2024-06-01T12:00:00.000Z"
+    },
+    {
+      "created_at": "2024-01-15T10:01:00.000Z",
+      "description": "Major customer impact. Wake the on-call team.",
+      "id": "01BBBBBBBBBBBBBBBBBBBBBBBB",
+      "name": "SEV-High",
+      "rank": 1,
+      "updated_at": "2024-06-01T12:01:00.000Z"
+    },
+    {
+      "created_at": "2024-01-15T10:02:00.000Z",
+      "description": "Minor issue with limited blast radius. Fix during business hours.",
+      "id": "01CCCCCCCCCCCCCCCCCCCCCCCC",
+      "name": "SEV-Low",
+      "rank": 2,
+      "updated_at": "2024-06-01T12:02:00.000Z"
+    }
+  ]
+}
