@@ -30,8 +30,8 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 	var (
 		status string
 		source string
-		since  string
-		until  string
+		from  string
+		to    string
 		limit  int
 		after  string
 		full   bool
@@ -44,15 +44,15 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 			g := globals()
 
 			var createdAfter, createdBefore string
-			if since != "" {
-				t, err := shared.ParseTime(since)
+			if from != "" {
+				t, err := shared.ParseTime(from)
 				if err != nil {
 					return err
 				}
 				createdAfter = t.Format("2006-01-02")
 			}
-			if until != "" {
-				t, err := shared.ParseTime(until)
+			if to != "" {
+				t, err := shared.ParseTime(to)
 				if err != nil {
 					return err
 				}
@@ -95,8 +95,8 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 	cmd.Flags().StringVar(&status, "status", "", "Filter by status (comma-separated, e.g. firing,resolved)")
 	cmd.Flags().StringVar(&source, "source", "", "Filter by deduplication key")
-	cmd.Flags().StringVar(&since, "since", "", "Only show alerts created after this time")
-	cmd.Flags().StringVar(&until, "until", "", "Only show alerts created before this time")
+	cmd.Flags().StringVar(&from, "from", "", "Only show alerts created after this time")
+	cmd.Flags().StringVar(&to, "to", "", "Only show alerts created before this time")
 	cmd.Flags().IntVar(&limit, "limit", 25, "Maximum number of alerts to return")
 	cmd.Flags().StringVar(&after, "after", "", "Pagination cursor")
 	cmd.Flags().BoolVar(&full, "full", false, "Show full alert details instead of compact view")

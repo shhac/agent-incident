@@ -9,7 +9,7 @@ List alerts with optional filters.
 Flags:
   --status <s>    Filter by status (comma-separated: firing,resolved)
   --source <key>  Filter by deduplication key
-  --since <time>  Filter by creation time (relative: now-1h, RFC3339, or epoch)
+  --from <time>   Filter by creation time (relative: now-1h, RFC3339, or epoch)
   --limit <n>     Page size (default 25)
   --after <cursor> Pagination cursor from previous response
   --full          Show full alert details (default: compact view)

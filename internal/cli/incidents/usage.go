@@ -8,7 +8,7 @@ const incidentsLLMHelp = `# incidents domain — agent-incident CLI
 List incidents with optional filters.
   --status   Filter by status category: active, closed, paused, post_incident, declined, canceled
   --severity Filter by severity name (can specify multiple)
-  --since    Show incidents created after this time (supports relative: now-1h, RFC3339, unix epoch)
+  --from     Show incidents created after this time (supports relative: now-1h, RFC3339, unix epoch)
   --limit    Page size (default 25)
   --after    Pagination cursor from previous response
   --full     Return full incident objects (default: compact with id, name, status, severity, created_at, incident_lead)
@@ -22,8 +22,8 @@ Create a new incident.
   --severity  Severity ID (use severity list to find IDs)
   --summary   Incident summary text
 
-### incidents edit <id>
-Edit an existing incident.
+### incidents edit <id-or-reference>
+Edit an existing incident (accepts INC-2000, 2000, or UUID).
   --status    New incident status
   --severity  New severity ID
   --summary   Updated summary

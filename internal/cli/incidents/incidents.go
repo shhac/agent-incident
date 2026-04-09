@@ -57,8 +57,8 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 	var (
 		status   []string
 		severity []string
-		since    string
-		until    string
+		from  string
+		to    string
 		limit    int
 		after    string
 		full     bool
@@ -71,15 +71,15 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 			g := globals()
 
 			var createdAfter, createdBefore string
-			if since != "" {
-				t, err := shared.ParseTime(since)
+			if from != "" {
+				t, err := shared.ParseTime(from)
 				if err != nil {
 					return err
 				}
 				createdAfter = t.Format("2006-01-02")
 			}
-			if until != "" {
-				t, err := shared.ParseTime(until)
+			if to != "" {
+				t, err := shared.ParseTime(to)
 				if err != nil {
 					return err
 				}
@@ -116,8 +116,8 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 	cmd.Flags().StringSliceVar(&status, "status", nil, "Filter by status category (active, closed, etc.)")
 	cmd.Flags().StringSliceVar(&severity, "severity", nil, "Filter by severity name")
-	cmd.Flags().StringVar(&since, "since", "", "Only show incidents created after this time")
-	cmd.Flags().StringVar(&until, "until", "", "Only show incidents created before this time")
+	cmd.Flags().StringVar(&from, "from", "", "Only show incidents created after this time")
+	cmd.Flags().StringVar(&to, "to", "", "Only show incidents created before this time")
 	cmd.Flags().IntVar(&limit, "limit", 25, "Number of results per page")
 	cmd.Flags().StringVar(&after, "after", "", "Pagination cursor")
 	cmd.Flags().BoolVar(&full, "full", false, "Return full incident objects instead of compact")
@@ -191,8 +191,8 @@ func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "edit <id>",
-		Short: "Edit an existing incident",
+		Use:   "edit <id-or-reference>",
+		Short: "Edit an existing incident (accepts INC-2000, 2000, or UUID)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
@@ -209,7 +209,10 @@ func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 				}
 
 				params := api.EditIncidentParams{Incident: fields}
-				id := normalizeIncidentRef(args[0])
+				id, err := resolveIncidentID(ctx, client, args[0])
+				if err != nil {
+					return err
+				}
 				incident, err := client.EditIncident(ctx, id, params)
 				if err != nil {
 					return err
