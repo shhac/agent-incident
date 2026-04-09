@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 
 	agenterrors "github.com/shhac/agent-incident/internal/errors"
@@ -19,6 +20,7 @@ type Client struct {
 	baseURL string
 	apiKey  string
 	http    *http.Client
+	debug   bool
 }
 
 func NewClient(apiKey string) *Client {
@@ -35,6 +37,11 @@ func NewTestClient(baseURL, apiKey string) *Client {
 		apiKey:  apiKey,
 		http:    &http.Client{},
 	}
+}
+
+// SetDebug enables HTTP request/response logging to stderr.
+func (c *Client) SetDebug(enabled bool) {
+	c.debug = enabled
 }
 
 func (c *Client) do(ctx context.Context, method, path string, body any) (json.RawMessage, error) {
@@ -66,6 +73,10 @@ func (c *Client) do(ctx context.Context, method, path string, body any) (json.Ra
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, agenterrors.Wrap(err, agenterrors.FixableByRetry)
+	}
+
+	if c.debug {
+		c.logDebug(method, reqURL, resp.StatusCode, respBody)
 	}
 
 	if resp.StatusCode >= 400 {
@@ -168,4 +179,23 @@ func classifyHTTPError(status int, body []byte) *agenterrors.APIError {
 	default:
 		return agenterrors.New(msg, agenterrors.FixableByAgent)
 	}
+}
+
+func (c *Client) logDebug(method, url string, status int, body []byte) {
+	entry := map[string]any{
+		"@debug": "http",
+		"method": method,
+		"url":    url,
+		"status": status,
+	}
+	var parsed any
+	if json.Unmarshal(body, &parsed) == nil {
+		entry["body"] = parsed
+	} else {
+		entry["body_raw"] = string(body)
+	}
+	enc := json.NewEncoder(os.Stderr)
+	enc.SetIndent("", "  ")
+	enc.SetEscapeHTML(false)
+	_ = enc.Encode(entry)
 }

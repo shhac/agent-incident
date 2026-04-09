@@ -28,7 +28,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "List all incident roles",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				items, err := client.ListIncidentRoles(ctx)
 				if err != nil {
 					return err
@@ -48,7 +48,7 @@ func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				item, err := client.GetIncidentRole(ctx, args[0])
 				if err != nil {
 					return err

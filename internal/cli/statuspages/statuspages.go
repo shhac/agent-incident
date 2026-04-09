@@ -37,7 +37,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "List status pages",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				items, err := client.ListStatusPages(ctx)
 				if err != nil {
 					return err
@@ -58,7 +58,7 @@ func registerIncidentsList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "List status page incidents",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				items, err := client.ListStatusPageIncidents(ctx, pageID)
 				if err != nil {
 					return err
@@ -83,7 +83,7 @@ func registerIncidentsCreate(parent *cobra.Command, globals shared.GlobalsFunc) 
 			if !shared.RequireFlag("page", pageID, "") || !shared.RequireFlag("name", name, "") {
 				return nil
 			}
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				item, err := client.CreateStatusPageIncident(ctx, api.CreateStatusPageIncidentParams{
 					StatusPageID: pageID,
 					Name:         name,
@@ -110,7 +110,7 @@ func registerIncidentsUpdate(parent *cobra.Command, globals shared.GlobalsFunc) 
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				item, err := client.UpdateStatusPageIncident(ctx, args[0], api.UpdateStatusPageIncidentParams{
 					Status: status,
 				})

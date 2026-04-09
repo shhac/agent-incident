@@ -28,6 +28,7 @@ var (
 	flagAPIKey  string
 	flagFormat  string
 	flagTimeout int
+	flagDebug   bool
 )
 
 func allGlobals() *shared.GlobalFlags {
@@ -36,6 +37,7 @@ func allGlobals() *shared.GlobalFlags {
 		APIKey:  flagAPIKey,
 		Format:  flagFormat,
 		Timeout: flagTimeout,
+		Debug:   flagDebug,
 	}
 }
 
@@ -52,6 +54,7 @@ func newRootCmd(version string) *cobra.Command {
 	root.PersistentFlags().StringVar(&flagAPIKey, "api-key", "", "API key (overrides stored credentials)")
 	root.PersistentFlags().StringVar(&flagFormat, "format", "", "Output format: json, yaml, jsonl")
 	root.PersistentFlags().IntVar(&flagTimeout, "timeout", 0, "Request timeout in milliseconds")
+	root.PersistentFlags().BoolVar(&flagDebug, "debug", false, "Log HTTP requests and responses to stderr")
 
 	registerLLMHelpCommand(root)
 	auth.Register(root)

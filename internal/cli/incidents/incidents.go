@@ -75,7 +75,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 				}
 			}
 
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				opts := api.ListIncidentsOpts{
 					StatusCategory: status,
 					Severity:       severity,
@@ -117,7 +117,7 @@ func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				id := normalizeIncidentRef(args[0])
 				incident, err := client.GetIncident(ctx, id)
 				if err != nil {
@@ -146,7 +146,7 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 				return nil
 			}
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				params := api.CreateIncidentParams{
 					Name:           name,
 					Summary:        summary,
@@ -182,7 +182,7 @@ func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				fields := api.EditIncidentFields{}
 				if cmd.Flags().Changed("name") {
 					fields.Name = &name
@@ -223,7 +223,7 @@ func registerUpdates(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				updates, cursor, err := client.ListIncidentUpdates(ctx, args[0], limit, after)
 				if err != nil {
 					return err

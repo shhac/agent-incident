@@ -21,6 +21,7 @@ type GlobalFlags struct {
 	APIKey  string
 	Format  string
 	Timeout int
+	Debug   bool
 }
 
 // GlobalsFunc is the signature for the globals accessor passed to domain Register functions.
@@ -103,8 +104,8 @@ func NewClientFromFlags(apiKeyFlag, orgAlias string) (*api.Client, error) {
 var ClientFactory func() (*api.Client, error)
 
 // WithClient resolves an API client and runs the callback. Errors are written to stderr.
-func WithClient(apiKey, orgAlias string, timeout int, fn func(ctx context.Context, client *api.Client) error) error {
-	ctx, cancel := MakeContext(timeout)
+func WithClient(g *GlobalFlags, fn func(ctx context.Context, client *api.Client) error) error {
+	ctx, cancel := MakeContext(g.Timeout)
 	defer cancel()
 
 	var client *api.Client
@@ -112,12 +113,14 @@ func WithClient(apiKey, orgAlias string, timeout int, fn func(ctx context.Contex
 	if ClientFactory != nil {
 		client, err = ClientFactory()
 	} else {
-		client, err = NewClientFromFlags(apiKey, orgAlias)
+		client, err = NewClientFromFlags(g.APIKey, g.Org)
 	}
 	if err != nil {
 		output.WriteError(os.Stderr, err)
 		return nil
 	}
+
+	client.SetDebug(g.Debug)
 
 	if err := fn(ctx, client); err != nil {
 		output.WriteError(os.Stderr, err)

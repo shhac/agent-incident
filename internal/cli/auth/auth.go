@@ -76,7 +76,7 @@ func registerCheck(parent *cobra.Command) {
 				alias = args[0]
 			}
 
-			return shared.WithClient("", alias, 0, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(&shared.GlobalFlags{Org: alias}, func(ctx context.Context, client *api.Client) error {
 				identity, err := client.GetIdentity(ctx)
 				if err != nil {
 					return err

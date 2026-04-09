@@ -31,7 +31,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "List schedules",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				schedules, err := client.ListSchedules(ctx)
 				if err != nil {
 					return err
@@ -51,7 +51,7 @@ func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				schedule, err := client.GetSchedule(ctx, args[0])
 				if err != nil {
 					return err
@@ -81,7 +81,7 @@ func registerEntries(parent *cobra.Command, globals shared.GlobalsFunc) {
 			}
 
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				entries, err := client.ListScheduleEntries(ctx, args[0], fromTime, toTime)
 				if err != nil {
 					return err
@@ -129,7 +129,7 @@ func registerOverride(parent *cobra.Command, globals shared.GlobalsFunc) {
 			}
 
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				params := api.ScheduleOverrideParams{
 					ScheduleID: args[0],
 					UserID:     userID,

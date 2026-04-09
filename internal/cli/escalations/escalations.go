@@ -31,7 +31,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "List escalations",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				escalations, err := client.ListEscalations(ctx)
 				if err != nil {
 					return err
@@ -51,7 +51,7 @@ func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				escalation, err := client.GetEscalation(ctx, args[0])
 				if err != nil {
 					return err
@@ -82,7 +82,7 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 			}
 
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				params := api.CreateEscalationParams{
 					IncidentID:       incidentID,
 					EscalationPathID: pathID,
@@ -120,7 +120,7 @@ func registerPathsList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "List escalation paths",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				paths, err := client.ListEscalationPaths(ctx)
 				if err != nil {
 					return err
@@ -140,7 +140,7 @@ func registerPathsGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				path, err := client.GetEscalationPath(ctx, args[0])
 				if err != nil {
 					return err

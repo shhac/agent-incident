@@ -40,7 +40,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "List alerts with optional filters",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				opts := api.ListAlertsOpts{
 					PageSize: limit,
 					After:    after,
@@ -88,7 +88,7 @@ func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				alert, err := client.GetAlert(ctx, args[0])
 				if err != nil {
 					return err
@@ -121,7 +121,7 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 			}
 
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				params := api.CreateAlertEventParams{
 					Title:       title,
 					Description: description,
@@ -154,7 +154,7 @@ func registerIncidents(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "List alerts attached to incidents",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				result, err := client.ListIncidentAlerts(ctx, limit, after)
 				if err != nil {
 					return err
