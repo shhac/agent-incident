@@ -6,8 +6,12 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/shhac/agent-incident/internal/cli/alerts"
 	"github.com/shhac/agent-incident/internal/cli/auth"
+	"github.com/shhac/agent-incident/internal/cli/incidents"
+	"github.com/shhac/agent-incident/internal/cli/severities"
 	"github.com/shhac/agent-incident/internal/cli/shared"
+	"github.com/shhac/agent-incident/internal/cli/statuses"
 )
 
 var (
@@ -42,6 +46,10 @@ func newRootCmd(version string) *cobra.Command {
 
 	registerLLMHelpCommand(root)
 	auth.Register(root)
+	incidents.Register(root, allGlobals)
+	alerts.Register(root, allGlobals)
+	severities.Register(root, allGlobals)
+	statuses.Register(root, allGlobals)
 
 	return root
 }

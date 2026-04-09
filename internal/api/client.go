@@ -95,6 +95,12 @@ func doAndDecodeField[W any, T any](c *Client, ctx context.Context, method, path
 	return extract(wrapper), nil
 }
 
+// paginationMeta is the shared pagination envelope used by incident.io list endpoints.
+type paginationMeta struct {
+	After        string `json:"after,omitempty"`
+	TotalRecords int    `json:"total_record_count,omitempty"`
+}
+
 func buildPath(base string, params url.Values) string {
 	if encoded := params.Encode(); encoded != "" {
 		return base + "?" + encoded
