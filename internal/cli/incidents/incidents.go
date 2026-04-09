@@ -25,6 +25,17 @@ func normalizeIncidentRef(ref string) string {
 	return ref
 }
 
+// resolveIncidentID converts a reference (INC-2000, 2000) to a UUID by fetching the incident.
+// If the input is already a UUID-length string, it's returned as-is.
+func resolveIncidentID(ctx context.Context, client *api.Client, ref string) (string, error) {
+	normalized := normalizeIncidentRef(ref)
+	incident, err := client.GetIncident(ctx, normalized)
+	if err != nil {
+		return "", err
+	}
+	return incident.ID, nil
+}
+
 // Register adds the incidents command group to the root command.
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	incidents := &cobra.Command{
@@ -198,7 +209,8 @@ func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 				}
 
 				params := api.EditIncidentParams{Incident: fields}
-				incident, err := client.EditIncident(ctx, args[0], params)
+				id := normalizeIncidentRef(args[0])
+				incident, err := client.EditIncident(ctx, id, params)
 				if err != nil {
 					return err
 				}
@@ -227,7 +239,11 @@ func registerUpdates(parent *cobra.Command, globals shared.GlobalsFunc) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
-				updates, cursor, err := client.ListIncidentUpdates(ctx, args[0], limit, after)
+				incidentID, err := resolveIncidentID(ctx, client, args[0])
+				if err != nil {
+					return err
+				}
+				updates, cursor, err := client.ListIncidentUpdates(ctx, incidentID, limit, after)
 				if err != nil {
 					return err
 				}

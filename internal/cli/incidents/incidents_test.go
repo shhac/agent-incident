@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -224,18 +225,28 @@ func TestNormalizeIncidentRefViaGet(t *testing.T) {
 }
 
 func TestIncidentsUpdates(t *testing.T) {
-	var gotPath, gotMethod string
+	var gotUpdatesPath, gotUpdatesMethod string
 	var gotQuery map[string][]string
 
 	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
-		gotPath = r.URL.Path
-		gotMethod = r.Method
+		if strings.HasPrefix(r.URL.Path, "/v2/incidents/") && !strings.Contains(r.URL.Path, "incident_updates") {
+			// Resolve incident ID
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{
+					ID:   "01ABC-RESOLVED-UUID",
+					Name: "Test",
+				},
+			})
+			return
+		}
+		gotUpdatesPath = r.URL.Path
+		gotUpdatesMethod = r.Method
 		gotQuery = r.URL.Query()
 		json.NewEncoder(w).Encode(map[string]any{
 			"incident_updates": []api.IncidentUpdate{
 				{
 					ID:         "upd-1",
-					IncidentID: "inc-42",
+					IncidentID: "01ABC-RESOLVED-UUID",
 					Message:    "Status update",
 					CreatedAt:  "2024-01-01T00:00:00Z",
 				},
@@ -250,13 +261,13 @@ func TestIncidentsUpdates(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if gotPath != "/v2/incident_updates" {
-		t.Errorf("expected path /v2/incident_updates, got %q", gotPath)
+	if gotUpdatesPath != "/v2/incident_updates" {
+		t.Errorf("expected path /v2/incident_updates, got %q", gotUpdatesPath)
 	}
-	if gotMethod != http.MethodGet {
-		t.Errorf("expected GET, got %s", gotMethod)
+	if gotUpdatesMethod != http.MethodGet {
+		t.Errorf("expected GET, got %s", gotUpdatesMethod)
 	}
-	if vals := gotQuery["incident_id"]; len(vals) == 0 || vals[0] != "inc-42" {
+	if vals := gotQuery["incident_id"]; len(vals) == 0 || vals[0] != "01ABC-RESOLVED-UUID" {
 		t.Errorf("expected incident_id=inc-42, got %v", gotQuery["incident_id"])
 	}
 }
