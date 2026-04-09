@@ -32,8 +32,8 @@ func TestStatusPagesList(t *testing.T) {
 		gotMethod = r.Method
 		json.NewEncoder(w).Encode(map[string]any{
 			"status_pages": []api.StatusPage{
-				{ID: "sp-1", Name: "Public Status"},
-				{ID: "sp-2", Name: "Internal Status"},
+				{ID: "01HRDKWWNGX330JQ4J1SPAGE01", Name: "Public Status"},
+				{ID: "01HRDKXJX3HFSN0R66ESPAGE02", Name: "Internal Status"},
 			},
 		})
 	})
@@ -103,7 +103,7 @@ func TestStatusPagesIncidentsCreate(t *testing.T) {
 	root := newTestRoot()
 	root.SetArgs([]string{
 		"status-page", "update", "create",
-		"--page", "sp-1",
+		"--page", "01HRDKWWNGX330JQ4J1SPAGE01",
 		"--name", "API Degradation",
 	})
 
@@ -117,8 +117,8 @@ func TestStatusPagesIncidentsCreate(t *testing.T) {
 	if gotMethod != http.MethodPost {
 		t.Errorf("expected POST, got %s", gotMethod)
 	}
-	if gotBody["status_page_id"] != "sp-1" {
-		t.Errorf("expected status_page_id sp-1, got %v", gotBody["status_page_id"])
+	if gotBody["status_page_id"] != "01HRDKWWNGX330JQ4J1SPAGE01" {
+		t.Errorf("expected status_page_id 01HRDKWWNGX330JQ4J1SPAGE01, got %v", gotBody["status_page_id"])
 	}
 	if gotBody["name"] != "API Degradation" {
 		t.Errorf("expected name 'API Degradation', got %v", gotBody["name"])

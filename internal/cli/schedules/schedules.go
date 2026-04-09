@@ -46,13 +46,17 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:   "get <id>",
-		Short: "Get a single schedule by ID",
+		Use:   "get <name-or-id>",
+		Short: "Get a single schedule by name or ID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
-				schedule, err := client.GetSchedule(ctx, args[0])
+				id, err := shared.ResolveScheduleID(ctx, client, args[0])
+				if err != nil {
+					return err
+				}
+				schedule, err := client.GetSchedule(ctx, id)
 				if err != nil {
 					return err
 				}
@@ -71,7 +75,7 @@ func registerEntries(parent *cobra.Command, globals shared.GlobalsFunc) {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "entries <schedule-id>",
+		Use:   "entries <name-or-id>",
 		Short: "List schedule entries for a time window",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -82,7 +86,11 @@ func registerEntries(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 			g := globals()
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
-				entries, err := client.ListScheduleEntries(ctx, args[0], fromTime, toTime)
+				id, err := shared.ResolveScheduleID(ctx, client, args[0])
+				if err != nil {
+					return err
+				}
+				entries, err := client.ListScheduleEntries(ctx, id, fromTime, toTime)
 				if err != nil {
 					return err
 				}
@@ -105,11 +113,11 @@ func registerOverride(parent *cobra.Command, globals shared.GlobalsFunc) {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "override <schedule-id>",
+		Use:   "override <name-or-id>",
 		Short: "Create a schedule override",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !shared.RequireFlag("user", userID, "Provide --user with the user ID for the override") {
+			if !shared.RequireFlag("user", userID, "Provide --user with the user name, email, or ID for the override") {
 				return nil
 			}
 			if !shared.RequireFlag("from", from, "Provide --from for the override start time") {
@@ -130,9 +138,17 @@ func registerOverride(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 			g := globals()
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
+				scheduleID, err := shared.ResolveScheduleID(ctx, client, args[0])
+				if err != nil {
+					return err
+				}
+				resolvedUserID, err := shared.ResolveUserID(ctx, client, userID)
+				if err != nil {
+					return err
+				}
 				params := api.ScheduleOverrideParams{
-					ScheduleID: args[0],
-					UserID:     userID,
+					ScheduleID: scheduleID,
+					UserID:     resolvedUserID,
 					StartAt:    fromTime.Format("2006-01-02T15:04:05Z07:00"),
 					EndAt:      toTime.Format("2006-01-02T15:04:05Z07:00"),
 				}
@@ -146,7 +162,7 @@ func registerOverride(parent *cobra.Command, globals shared.GlobalsFunc) {
 		},
 	}
 
-	cmd.Flags().StringVar(&userID, "user", "", "User ID for the override (required)")
+	cmd.Flags().StringVar(&userID, "user", "", "User name, email, or ID for the override (required)")
 	cmd.Flags().StringVar(&from, "from", "", "Override start time (required)")
 	cmd.Flags().StringVar(&to, "to", "", "Override end time (required)")
 	parent.AddCommand(cmd)

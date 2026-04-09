@@ -87,8 +87,8 @@ func TestEscalationPathsList(t *testing.T) {
 		gotMethod = r.Method
 		json.NewEncoder(w).Encode(map[string]any{
 			"escalation_paths": []api.EscalationPath{
-				{ID: "path-1", Name: "Primary Path"},
-				{ID: "path-2", Name: "Secondary Path"},
+				{ID: "01HRDKWWNGX330JQ4J1PATH001", Name: "Primary Path"},
+				{ID: "01HRDKWWNGX330JQ4J1PATH002", Name: "Secondary Path"},
 			},
 		})
 	})
@@ -115,19 +115,19 @@ func TestEscalationPathsGet(t *testing.T) {
 		gotPath = r.URL.Path
 		gotMethod = r.Method
 		json.NewEncoder(w).Encode(map[string]any{
-			"escalation_path": api.EscalationPath{ID: "path-42", Name: "Critical Path"},
+			"escalation_path": api.EscalationPath{ID: "01HRDKWWNGX330JQ4JPATH0042", Name: "Critical Path"},
 		})
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"escalation", "path", "get", "path-42"})
+	root.SetArgs([]string{"escalation", "path", "get", "01HRDKWWNGX330JQ4JPATH0042"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if gotPath != "/v2/escalation_paths/path-42" {
-		t.Errorf("expected path /v2/escalation_paths/path-42, got %q", gotPath)
+	if gotPath != "/v2/escalation_paths/01HRDKWWNGX330JQ4JPATH0042" {
+		t.Errorf("expected path /v2/escalation_paths/01HRDKWWNGX330JQ4JPATH0042, got %q", gotPath)
 	}
 	if gotMethod != http.MethodGet {
 		t.Errorf("expected GET, got %s", gotMethod)
@@ -153,7 +153,7 @@ func TestEscalationsCreate(t *testing.T) {
 	root.SetArgs([]string{
 		"escalation", "create",
 		"--incident", "inc-1",
-		"--path", "path-1",
+		"--path", "01HRDKWWNGX330JQ4J1PATH001",
 	})
 
 	if err := root.Execute(); err != nil {
@@ -169,7 +169,7 @@ func TestEscalationsCreate(t *testing.T) {
 	if gotBody["incident_id"] != "inc-1" {
 		t.Errorf("expected incident_id inc-1, got %v", gotBody["incident_id"])
 	}
-	if gotBody["escalation_path_id"] != "path-1" {
-		t.Errorf("expected escalation_path_id path-1, got %v", gotBody["escalation_path_id"])
+	if gotBody["escalation_path_id"] != "01HRDKWWNGX330JQ4J1PATH001" {
+		t.Errorf("expected escalation_path_id 01HRDKWWNGX330JQ4J1PATH001, got %v", gotBody["escalation_path_id"])
 	}
 }

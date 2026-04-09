@@ -32,8 +32,8 @@ func TestSchedulesList(t *testing.T) {
 		gotMethod = r.Method
 		json.NewEncoder(w).Encode(map[string]any{
 			"schedules": []api.Schedule{
-				{ID: "sched-1", Name: "Primary On-Call"},
-				{ID: "sched-2", Name: "Secondary On-Call"},
+				{ID: "01HRDKWWNGX330JQ4J1PERJP8Y", Name: "Primary On-Call"},
+				{ID: "01HRDKXJX3HFSN0R66E93FRX23", Name: "Secondary On-Call"},
 			},
 		})
 	})
@@ -60,19 +60,19 @@ func TestSchedulesGet(t *testing.T) {
 		gotPath = r.URL.Path
 		gotMethod = r.Method
 		json.NewEncoder(w).Encode(map[string]any{
-			"schedule": api.Schedule{ID: "sched-42", Name: "Ops On-Call"},
+			"schedule": api.Schedule{ID: "01HRDKZPT5Q2PAMWN5R8WY23C3", Name: "Ops On-Call"},
 		})
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"schedule", "get", "sched-42"})
+	root.SetArgs([]string{"schedule", "get", "01HRDKZPT5Q2PAMWN5R8WY23C3"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if gotPath != "/v2/schedules/sched-42" {
-		t.Errorf("expected path /v2/schedules/sched-42, got %q", gotPath)
+	if gotPath != "/v2/schedules/01HRDKZPT5Q2PAMWN5R8WY23C3" {
+		t.Errorf("expected path /v2/schedules/01HRDKZPT5Q2PAMWN5R8WY23C3, got %q", gotPath)
 	}
 	if gotMethod != http.MethodGet {
 		t.Errorf("expected GET, got %s", gotMethod)
@@ -93,7 +93,7 @@ func TestSchedulesEntries(t *testing.T) {
 					{
 						RotationID:  "rot-1",
 						Fingerprint: "abc123",
-						User:        api.ScheduleEntryUser{ID: "user-1", Name: "Alice", Email: "alice@example.com", Role: "responder"},
+						User:        api.ScheduleEntryUser{ID: "01GF688HF8NVA17SNPGPYV5XNZ", Name: "Alice", Email: "alice@example.com", Role: "responder"},
 						StartAt:     "2026-04-09T08:00:00Z",
 						EndAt:       "2026-04-09T16:00:00Z",
 					},
@@ -103,7 +103,7 @@ func TestSchedulesEntries(t *testing.T) {
 					{
 						RotationID:  "rot-1",
 						Fingerprint: "abc123",
-						User:        api.ScheduleEntryUser{ID: "user-1", Name: "Alice", Email: "alice@example.com", Role: "responder"},
+						User:        api.ScheduleEntryUser{ID: "01GF688HF8NVA17SNPGPYV5XNZ", Name: "Alice", Email: "alice@example.com", Role: "responder"},
 						StartAt:     "2026-04-09T08:00:00Z",
 						EndAt:       "2026-04-09T16:00:00Z",
 					},
@@ -114,7 +114,7 @@ func TestSchedulesEntries(t *testing.T) {
 
 	root := newTestRoot()
 	root.SetArgs([]string{
-		"schedule", "entries", "sched-1",
+		"schedule", "entries", "01HRDKWWNGX330JQ4J1PERJP8Y",
 		"--from", "2026-04-09T08:00:00Z",
 		"--to", "2026-04-09T16:00:00Z",
 	})
@@ -129,8 +129,8 @@ func TestSchedulesEntries(t *testing.T) {
 	if gotMethod != http.MethodGet {
 		t.Errorf("expected GET, got %s", gotMethod)
 	}
-	if vals := gotQuery["schedule_id"]; len(vals) == 0 || vals[0] != "sched-1" {
-		t.Errorf("expected schedule_id=sched-1, got %v", gotQuery["schedule_id"])
+	if vals := gotQuery["schedule_id"]; len(vals) == 0 || vals[0] != "01HRDKWWNGX330JQ4J1PERJP8Y" {
+		t.Errorf("expected schedule_id=01HRDKWWNGX330JQ4J1PERJP8Y, got %v", gotQuery["schedule_id"])
 	}
 }
 
@@ -147,8 +147,8 @@ func TestSchedulesOverride(t *testing.T) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"schedule_override": api.ScheduleOverride{
 				ID:         "ovr-1",
-				ScheduleID: "sched-1",
-				UserID:     "user-1",
+				ScheduleID: "01HRDKWWNGX330JQ4J1PERJP8Y",
+				UserID:     "01GF688HF8NVA17SNPGPYV5XNZ",
 				StartAt:    "2026-04-09T10:00:00Z",
 				EndAt:      "2026-04-09T18:00:00Z",
 			},
@@ -157,8 +157,8 @@ func TestSchedulesOverride(t *testing.T) {
 
 	root := newTestRoot()
 	root.SetArgs([]string{
-		"schedule", "override", "sched-1",
-		"--user", "user-1",
+		"schedule", "override", "01HRDKWWNGX330JQ4J1PERJP8Y",
+		"--user", "01GF688HF8NVA17SNPGPYV5XNZ",
 		"--from", "2026-04-09T10:00:00Z",
 		"--to", "2026-04-09T18:00:00Z",
 	})
@@ -173,10 +173,10 @@ func TestSchedulesOverride(t *testing.T) {
 	if gotMethod != http.MethodPost {
 		t.Errorf("expected POST, got %s", gotMethod)
 	}
-	if gotBody["schedule_id"] != "sched-1" {
-		t.Errorf("expected schedule_id sched-1, got %v", gotBody["schedule_id"])
+	if gotBody["schedule_id"] != "01HRDKWWNGX330JQ4J1PERJP8Y" {
+		t.Errorf("expected schedule_id 01HRDKWWNGX330JQ4J1PERJP8Y, got %v", gotBody["schedule_id"])
 	}
-	if gotBody["user_id"] != "user-1" {
-		t.Errorf("expected user_id user-1, got %v", gotBody["user_id"])
+	if gotBody["user_id"] != "01GF688HF8NVA17SNPGPYV5XNZ" {
+		t.Errorf("expected user_id 01GF688HF8NVA17SNPGPYV5XNZ, got %v", gotBody["user_id"])
 	}
 }

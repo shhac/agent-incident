@@ -34,9 +34,9 @@ Query and manage incident.io incidents, alerts, schedules, escalations, and stat
 1. **What's happening?** `incident list --status active` to see active incidents
 2. **How bad is it?** `incident get INC-2000` for full details including severity and timeline
 3. **What triggered it?** `alert list --status firing` to see current alerts
-4. **Who's on-call?** `oncall schedule entries <schedule-id> --from now --to now+1h`
-5. **Escalate if needed:** `oncall escalation create --incident <id> --path <path-id>`
-6. **Communicate:** `status-page update create --page <id> --name "..."`
+4. **Who's on-call?** `oncall schedule entries Engineering --from now --to now+1h`
+5. **Escalate if needed:** `oncall escalation create --incident <id> --path "Primary Path"`
+6. **Communicate:** `status-page update create --page "Public Status" --name "..."`
 
 ### Always read before acting
 
@@ -62,28 +62,28 @@ agent-incident alert list --status firing
 agent-incident incident get INC-2000
 agent-incident incident updates <id>
 
-# Who's on-call?
+# Who's on-call? (accepts schedule name or ID)
 agent-incident oncall schedule list
-agent-incident oncall schedule entries <schedule-id> --from now --to now+1h
+agent-incident oncall schedule entries Engineering --from now --to now+1h
 
-# Respond
-agent-incident oncall escalation create --incident <id> --path <path-id>
-agent-incident incident edit <id> --summary "Root cause identified: ..."
+# Respond (--path accepts name or ID)
+agent-incident oncall escalation create --incident <id> --path "Primary Path"
+agent-incident incident edit INC-2000 --summary "Root cause identified: ..."
 
 # Create an incident (use ref severity list to find valid IDs)
 agent-incident ref severity list
 agent-incident incident create --name "API latency spike" --severity <severity-id>
 
-# Override on-call coverage
-agent-incident oncall schedule override <schedule-id> --user <user-id> --from now --to now+4h
+# Override on-call coverage (accepts names for schedule and user)
+agent-incident oncall schedule override Engineering --user alice@example.com --from now --to now+4h
 
 # After resolution
 agent-incident follow-up list --incident <id>
 agent-incident action list --incident <id>
 
-# Communicate externally
+# Communicate externally (--page accepts name or ID)
 agent-incident status-page list
-agent-incident status-page update create --page <id> --name "Degraded API performance"
+agent-incident status-page update create --page "Public Status" --name "Degraded API performance"
 agent-incident status-page update update <sp-inc-id> --status resolved
 ```
 
@@ -92,6 +92,7 @@ agent-incident status-page update update <sp-inc-id> --status resolved
 - **Time formats**: relative (`now-15m`, `now-1h`, `now+1h`), RFC3339, or unix epoch
 - **Output**: NDJSON for lists (one object per line), JSON for single items. `--full` for complete API response. `--format json|yaml|jsonl` to override
 - **Compact mode**: List commands omit large fields (description, custom fields, timestamps) by default. Use `--full` to include everything
+- **Name resolution**: Schedule, escalation path, status page, and user arguments accept names (case-insensitive, substring match). If the value looks like a ULID it's used as-is; otherwise a list lookup resolves the name to an ID. Ambiguous matches error with options listed.
 - **Pagination**: `--limit N` controls page size, `--after <cursor>` for next page. Cursor is returned in `@pagination` NDJSON line
 
 ## Deeper Reference

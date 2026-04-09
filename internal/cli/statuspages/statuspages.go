@@ -51,7 +51,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 }
 
 func registerIncidentsList(parent *cobra.Command, globals shared.GlobalsFunc) {
-	var pageID string
+	var pageRef string
 
 	cmd := &cobra.Command{
 		Use:   "list",
@@ -59,6 +59,14 @@ func registerIncidentsList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
+				pageID := pageRef
+				if pageRef != "" {
+					resolved, err := shared.ResolveStatusPageID(ctx, client, pageRef)
+					if err != nil {
+						return err
+					}
+					pageID = resolved
+				}
 				items, err := client.ListStatusPageIncidents(ctx, pageID)
 				if err != nil {
 					return err
@@ -68,24 +76,28 @@ func registerIncidentsList(parent *cobra.Command, globals shared.GlobalsFunc) {
 			})
 		},
 	}
-	cmd.Flags().StringVar(&pageID, "page", "", "Filter by status page ID")
+	cmd.Flags().StringVar(&pageRef, "page", "", "Filter by status page name or ID")
 	parent.AddCommand(cmd)
 }
 
 func registerIncidentsCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
-	var pageID, name string
+	var pageRef, name string
 
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a status page incident",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			pageOk := shared.RequireFlag("page", pageID, "")
+			pageOk := shared.RequireFlag("page", pageRef, "")
 			nameOk := shared.RequireFlag("name", name, "")
 			if !pageOk || !nameOk {
 				return nil
 			}
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
+				pageID, err := shared.ResolveStatusPageID(ctx, client, pageRef)
+				if err != nil {
+					return err
+				}
 				item, err := client.CreateStatusPageIncident(ctx, api.CreateStatusPageIncidentParams{
 					StatusPageID: pageID,
 					Name:         name,
@@ -98,7 +110,7 @@ func registerIncidentsCreate(parent *cobra.Command, globals shared.GlobalsFunc) 
 			})
 		},
 	}
-	cmd.Flags().StringVar(&pageID, "page", "", "Status page ID (required)")
+	cmd.Flags().StringVar(&pageRef, "page", "", "Status page name or ID (required)")
 	cmd.Flags().StringVar(&name, "name", "", "Incident name (required)")
 	parent.AddCommand(cmd)
 }

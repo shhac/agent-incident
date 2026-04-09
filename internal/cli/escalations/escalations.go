@@ -83,9 +83,13 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 			g := globals()
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
+				resolvedPathID, err := shared.ResolveEscalationPathID(ctx, client, pathID)
+				if err != nil {
+					return err
+				}
 				params := api.CreateEscalationParams{
 					IncidentID:       incidentID,
-					EscalationPathID: pathID,
+					EscalationPathID: resolvedPathID,
 				}
 				escalation, err := client.CreateEscalation(ctx, params)
 				if err != nil {
@@ -98,7 +102,7 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 	}
 
 	cmd.Flags().StringVar(&incidentID, "incident", "", "Incident ID (required)")
-	cmd.Flags().StringVar(&pathID, "path", "", "Escalation path ID (required)")
+	cmd.Flags().StringVar(&pathID, "path", "", "Escalation path name or ID (required)")
 	parent.AddCommand(cmd)
 }
 
