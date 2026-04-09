@@ -4,12 +4,37 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"strings"
+	"unicode"
 
 	"github.com/spf13/cobra"
 
 	"github.com/shhac/agent-incident/internal/api"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
+
+// normalizeIncidentRef strips a "INC-" prefix when followed by digits,
+// so users can pass "INC-2000" or "2000" as an incident reference.
+// UUIDs and other ID formats are passed through unchanged.
+func normalizeIncidentRef(ref string) string {
+	upper := strings.ToUpper(ref)
+	if strings.HasPrefix(upper, "INC-") {
+		suffix := ref[4:]
+		if len(suffix) > 0 && allDigits(suffix) {
+			return suffix
+		}
+	}
+	return ref
+}
+
+func allDigits(s string) bool {
+	for _, r := range s {
+		if !unicode.IsDigit(r) {
+			return false
+		}
+	}
+	return true
+}
 
 // Register adds the incidents command group to the root command.
 func Register(root *cobra.Command, globals shared.GlobalsFunc) {
@@ -87,13 +112,14 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:   "get <id>",
-		Short: "Get a single incident by ID",
+		Use:   "get <id-or-reference>",
+		Short: "Get a single incident by ID or reference (e.g. INC-2000 or 2000)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
 			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
-				incident, err := client.GetIncident(ctx, args[0])
+				id := normalizeIncidentRef(args[0])
+				incident, err := client.GetIncident(ctx, id)
 				if err != nil {
 					return err
 				}

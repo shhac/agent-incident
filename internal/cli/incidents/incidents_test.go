@@ -80,7 +80,7 @@ func TestIncidentsGet(t *testing.T) {
 		gotMethod = r.Method
 		json.NewEncoder(w).Encode(map[string]any{
 			"incident": api.Incident{
-				ID:   "inc-123",
+				ID:   "01ABC123DEF456",
 				Name: "Specific Incident",
 				Status: api.IncidentStatusRef{
 					Category: "active",
@@ -91,14 +91,14 @@ func TestIncidentsGet(t *testing.T) {
 	})
 
 	root := newTestRoot()
-	root.SetArgs([]string{"incidents", "get", "inc-123"})
+	root.SetArgs([]string{"incidents", "get", "01ABC123DEF456"})
 
 	if err := root.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if gotPath != "/v2/incidents/inc-123" {
-		t.Errorf("expected path /v2/incidents/inc-123, got %q", gotPath)
+	if gotPath != "/v2/incidents/01ABC123DEF456" {
+		t.Errorf("expected path /v2/incidents/01ABC123DEF456, got %q", gotPath)
 	}
 	if gotMethod != http.MethodGet {
 		t.Errorf("expected GET, got %s", gotMethod)
