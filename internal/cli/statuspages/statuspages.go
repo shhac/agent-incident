@@ -1,0 +1,127 @@
+package statuspages
+
+import (
+	"context"
+
+	"github.com/spf13/cobra"
+
+	"github.com/shhac/agent-incident/internal/api"
+	"github.com/shhac/agent-incident/internal/cli/shared"
+)
+
+func Register(root *cobra.Command, globals shared.GlobalsFunc) {
+	cmd := &cobra.Command{
+		Use:     "status-pages",
+		Aliases: []string{"statuspages"},
+		Short:   "Manage status pages and their incidents",
+	}
+
+	registerList(cmd, globals)
+
+	incidents := &cobra.Command{
+		Use:   "incidents",
+		Short: "Manage status page incidents",
+	}
+	registerIncidentsList(incidents, globals)
+	registerIncidentsCreate(incidents, globals)
+	registerIncidentsUpdate(incidents, globals)
+	cmd.AddCommand(incidents)
+
+	registerLLMHelp(cmd)
+	root.AddCommand(cmd)
+}
+
+func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
+	cmd := &cobra.Command{
+		Use:   "list",
+		Short: "List status pages",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			g := globals()
+			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+				items, err := client.ListStatusPages(ctx)
+				if err != nil {
+					return err
+				}
+				shared.WritePaginatedList(shared.ToAnySlice(items), nil, g.Format)
+				return nil
+			})
+		},
+	}
+	parent.AddCommand(cmd)
+}
+
+func registerIncidentsList(parent *cobra.Command, globals shared.GlobalsFunc) {
+	var pageID string
+
+	cmd := &cobra.Command{
+		Use:   "list",
+		Short: "List status page incidents",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			g := globals()
+			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+				items, err := client.ListStatusPageIncidents(ctx, pageID)
+				if err != nil {
+					return err
+				}
+				shared.WritePaginatedList(shared.ToAnySlice(items), nil, g.Format)
+				return nil
+			})
+		},
+	}
+	cmd.Flags().StringVar(&pageID, "page", "", "Filter by status page ID")
+	parent.AddCommand(cmd)
+}
+
+func registerIncidentsCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
+	var pageID, name string
+
+	cmd := &cobra.Command{
+		Use:   "create",
+		Short: "Create a status page incident",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			g := globals()
+			if !shared.RequireFlag("page", pageID, "") || !shared.RequireFlag("name", name, "") {
+				return nil
+			}
+			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+				item, err := client.CreateStatusPageIncident(ctx, api.CreateStatusPageIncidentParams{
+					StatusPageID: pageID,
+					Name:         name,
+				})
+				if err != nil {
+					return err
+				}
+				shared.WriteItem(item, g.Format)
+				return nil
+			})
+		},
+	}
+	cmd.Flags().StringVar(&pageID, "page", "", "Status page ID (required)")
+	cmd.Flags().StringVar(&name, "name", "", "Incident name (required)")
+	parent.AddCommand(cmd)
+}
+
+func registerIncidentsUpdate(parent *cobra.Command, globals shared.GlobalsFunc) {
+	var status string
+
+	cmd := &cobra.Command{
+		Use:   "update <id>",
+		Short: "Update a status page incident",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			g := globals()
+			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
+				item, err := client.UpdateStatusPageIncident(ctx, args[0], api.UpdateStatusPageIncidentParams{
+					Status: status,
+				})
+				if err != nil {
+					return err
+				}
+				shared.WriteItem(item, g.Format)
+				return nil
+			})
+		},
+	}
+	cmd.Flags().StringVar(&status, "status", "", "New status")
+	parent.AddCommand(cmd)
+}

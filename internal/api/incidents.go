@@ -36,11 +36,11 @@ type IncidentUser struct {
 }
 
 type CustomFieldEntry struct {
-	CustomField *CustomField `json:"custom_field,omitempty"`
+	CustomField *CustomFieldRef `json:"custom_field,omitempty"`
 	Values      []CustomFieldValue `json:"values,omitempty"`
 }
 
-type CustomField struct {
+type CustomFieldRef struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }

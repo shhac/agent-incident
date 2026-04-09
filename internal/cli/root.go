@@ -6,12 +6,21 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/shhac/agent-incident/internal/cli/actions"
 	"github.com/shhac/agent-incident/internal/cli/alerts"
 	"github.com/shhac/agent-incident/internal/cli/auth"
+	"github.com/shhac/agent-incident/internal/cli/catalog"
+	"github.com/shhac/agent-incident/internal/cli/customfields"
+	"github.com/shhac/agent-incident/internal/cli/escalations"
+	"github.com/shhac/agent-incident/internal/cli/followups"
 	"github.com/shhac/agent-incident/internal/cli/incidents"
+	"github.com/shhac/agent-incident/internal/cli/roles"
+	"github.com/shhac/agent-incident/internal/cli/schedules"
 	"github.com/shhac/agent-incident/internal/cli/severities"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 	"github.com/shhac/agent-incident/internal/cli/statuses"
+	"github.com/shhac/agent-incident/internal/cli/statuspages"
+	"github.com/shhac/agent-incident/internal/cli/users"
 )
 
 var (
@@ -50,6 +59,15 @@ func newRootCmd(version string) *cobra.Command {
 	alerts.Register(root, allGlobals)
 	severities.Register(root, allGlobals)
 	statuses.Register(root, allGlobals)
+	users.Register(root, allGlobals)
+	roles.Register(root, allGlobals)
+	schedules.Register(root, allGlobals)
+	escalations.Register(root, allGlobals)
+	actions.Register(root, allGlobals)
+	followups.Register(root, allGlobals)
+	catalog.Register(root, allGlobals)
+	customfields.Register(root, allGlobals)
+	statuspages.Register(root, allGlobals)
 
 	return root
 }
