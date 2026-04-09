@@ -46,8 +46,8 @@ func ToCompactAlerts(alerts []Alert) []AlertCompact {
 type ListAlertsOpts struct {
 	Status           []string
 	DeduplicationKey string
-	CreatedAfter     string // RFC3339 timestamp for created_at[gte] filter
-	CreatedBefore    string // RFC3339 timestamp for created_at[lte] filter
+	CreatedAfter     string // yyyy-mm-dd date for created_at[gte] filter
+	CreatedBefore    string // yyyy-mm-dd date for created_at[lte] filter
 	PageSize         int
 	After            string
 }

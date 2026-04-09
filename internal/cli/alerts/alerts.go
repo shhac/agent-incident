@@ -3,7 +3,6 @@ package alerts
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 
@@ -50,14 +49,14 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 				if err != nil {
 					return err
 				}
-				createdAfter = t.Format(time.RFC3339)
+				createdAfter = t.Format("2006-01-02")
 			}
 			if until != "" {
 				t, err := shared.ParseTime(until)
 				if err != nil {
 					return err
 				}
-				createdBefore = t.Format(time.RFC3339)
+				createdBefore = t.Format("2006-01-02")
 			}
 
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
