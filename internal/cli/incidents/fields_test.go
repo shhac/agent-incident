@@ -11,6 +11,36 @@ import (
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
 
+func TestParseKeyValue(t *testing.T) {
+	tests := []struct {
+		input     string
+		wantKey   string
+		wantValue string
+		wantErr   bool
+	}{
+		{"Name=Value", "Name", "Value", false},
+		{"Key=", "Key", "", false},
+		{"=Value", "", "Value", false},
+		{"Key=Val=ue", "Key", "Val=ue", false},
+		{"NoEquals", "", "", true},
+		{"", "", "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			key, value, err := parseKeyValue(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("parseKeyValue(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
+			}
+			if key != tt.wantKey {
+				t.Errorf("key = %q, want %q", key, tt.wantKey)
+			}
+			if value != tt.wantValue {
+				t.Errorf("value = %q, want %q", value, tt.wantValue)
+			}
+		})
+	}
+}
+
 func TestIncidentsEditWithStatus(t *testing.T) {
 	var gotBody map[string]any
 
@@ -256,5 +286,222 @@ func TestIncidentsEditWithTimestamp(t *testing.T) {
 	}
 	if tsVal["value"] != "2026-04-09T15:30:00Z" {
 		t.Errorf("expected value '2026-04-09T15:30:00Z', got %v", tsVal["value"])
+	}
+}
+
+func TestIncidentsEditWithNumericField(t *testing.T) {
+	var gotBody map[string]any
+
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/v2/custom_fields":
+			json.NewEncoder(w).Encode(map[string]any{
+				"custom_fields": []map[string]any{
+					{"id": "cf-count", "name": "Affected Count", "field_type": "numeric"},
+				},
+			})
+		case strings.HasSuffix(r.URL.Path, "/actions/edit"):
+			body, _ := io.ReadAll(r.Body)
+			json.Unmarshal(body, &gotBody)
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		default:
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		}
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Affected Count=42"})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	incident := gotBody["incident"].(map[string]any)
+	entries := incident["custom_field_entries"].([]any)
+	entry := entries[0].(map[string]any)
+	vals := entry["values"].([]any)
+	val := vals[0].(map[string]any)
+	if val["value_numeric"] != "42" {
+		t.Errorf("expected value_numeric '42', got %v", val["value_numeric"])
+	}
+}
+
+func TestIncidentsEditWithLinkField(t *testing.T) {
+	var gotBody map[string]any
+
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/v2/custom_fields":
+			json.NewEncoder(w).Encode(map[string]any{
+				"custom_fields": []map[string]any{
+					{"id": "cf-link", "name": "Runbook", "field_type": "link"},
+				},
+			})
+		case strings.HasSuffix(r.URL.Path, "/actions/edit"):
+			body, _ := io.ReadAll(r.Body)
+			json.Unmarshal(body, &gotBody)
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		default:
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		}
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Runbook=https://example.com/runbook"})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	incident := gotBody["incident"].(map[string]any)
+	entries := incident["custom_field_entries"].([]any)
+	entry := entries[0].(map[string]any)
+	vals := entry["values"].([]any)
+	val := vals[0].(map[string]any)
+	if val["value_link"] != "https://example.com/runbook" {
+		t.Errorf("expected value_link, got %v", val["value_link"])
+	}
+}
+
+func TestIncidentsEditClearField(t *testing.T) {
+	var gotBody map[string]any
+
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/v2/custom_fields":
+			json.NewEncoder(w).Encode(map[string]any{
+				"custom_fields": []map[string]any{
+					{"id": "cf-cause", "name": "Root Cause", "field_type": "text"},
+				},
+			})
+		case strings.HasSuffix(r.URL.Path, "/actions/edit"):
+			body, _ := io.ReadAll(r.Body)
+			json.Unmarshal(body, &gotBody)
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		default:
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		}
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Root Cause="})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	incident := gotBody["incident"].(map[string]any)
+	entries := incident["custom_field_entries"].([]any)
+	entry := entries[0].(map[string]any)
+	vals := entry["values"].([]any)
+	if len(vals) != 0 {
+		t.Errorf("expected empty values array to clear field, got %v", vals)
+	}
+}
+
+func TestIncidentsEditClearTimestamp(t *testing.T) {
+	var gotBody map[string]any
+
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/v2/incident_timestamps":
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident_timestamps": []map[string]any{
+					{"id": "ts-resolved", "name": "Resolved at", "rank": 5},
+				},
+			})
+		case strings.HasSuffix(r.URL.Path, "/actions/edit"):
+			body, _ := io.ReadAll(r.Body)
+			json.Unmarshal(body, &gotBody)
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		default:
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		}
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"incident", "edit", "inc-1", "--timestamp", "Resolved at="})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	incident := gotBody["incident"].(map[string]any)
+	tsValues := incident["incident_timestamp_values"].([]any)
+	tsVal := tsValues[0].(map[string]any)
+	if tsVal["value"] != nil {
+		t.Errorf("expected null value to clear timestamp, got %v", tsVal["value"])
+	}
+}
+
+func TestIncidentsEditTimestampParseError(t *testing.T) {
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/v2/incident_timestamps":
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident_timestamps": []map[string]any{
+					{"id": "ts-resolved", "name": "Resolved at", "rank": 5},
+				},
+			})
+		default:
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		}
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"incident", "edit", "inc-1", "--timestamp", "Resolved at=not-a-date"})
+
+	err := root.Execute()
+	if err == nil {
+		t.Fatal("expected error for invalid timestamp")
+	}
+	if !strings.Contains(err.Error(), "Resolved at") {
+		t.Errorf("expected error to mention timestamp name, got %q", err.Error())
+	}
+}
+
+func TestIncidentsEditFieldNotFound(t *testing.T) {
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/v2/custom_fields":
+			json.NewEncoder(w).Encode(map[string]any{
+				"custom_fields": []map[string]any{
+					{"id": "cf-cause", "name": "Root Cause", "field_type": "text"},
+				},
+			})
+		default:
+			json.NewEncoder(w).Encode(map[string]any{
+				"incident": api.Incident{ID: "inc-1", Name: "Test"},
+			})
+		}
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Nonexistent=value"})
+
+	err := root.Execute()
+	if err == nil {
+		t.Fatal("expected error for unknown custom field")
+	}
+	if !strings.Contains(err.Error(), "Nonexistent") {
+		t.Errorf("expected error to mention field name, got %q", err.Error())
 	}
 }
