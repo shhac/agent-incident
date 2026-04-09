@@ -5,24 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	"github.com/shhac/agent-incident/internal/api"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
-
-func newTestRoot() *cobra.Command {
-	root := &cobra.Command{
-		Use:           "agent-incident",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
-	globals := func() *shared.GlobalFlags {
-		return &shared.GlobalFlags{}
-	}
-	Register(root, globals)
-	return root
-}
 
 func TestCustomFieldsList(t *testing.T) {
 	var gotPath, gotMethod string
@@ -38,7 +23,7 @@ func TestCustomFieldsList(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"custom-field", "list"})
 
 	if err := root.Execute(); err != nil {
@@ -64,7 +49,7 @@ func TestCustomFieldsGet(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"custom-field", "get", "cf-42"})
 
 	if err := root.Execute(); err != nil {

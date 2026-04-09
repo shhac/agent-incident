@@ -66,7 +66,7 @@ func TestIncidentsEditWithStatus(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--status", "Closed"})
 
 	if err := root.Execute(); err != nil {
@@ -104,7 +104,7 @@ func TestIncidentsEditWithSeverityName(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--severity", "Critical"})
 
 	if err := root.Execute(); err != nil {
@@ -149,7 +149,7 @@ func TestIncidentsEditWithCustomField(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Affected Team=Platform", "--field", "Root Cause=DNS misconfiguration"})
 
 	if err := root.Execute(); err != nil {
@@ -219,7 +219,7 @@ func TestIncidentsEditWithCatalogField(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Team=Platform"})
 
 	if err := root.Execute(); err != nil {
@@ -264,7 +264,7 @@ func TestIncidentsEditWithTimestamp(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--timestamp", "Resolved at=2026-04-09T15:30:00Z"})
 
 	if err := root.Execute(); err != nil {
@@ -313,7 +313,7 @@ func TestIncidentsEditWithNumericField(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Affected Count=42"})
 
 	if err := root.Execute(); err != nil {
@@ -354,7 +354,7 @@ func TestIncidentsEditWithLinkField(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Runbook=https://example.com/runbook"})
 
 	if err := root.Execute(); err != nil {
@@ -395,7 +395,7 @@ func TestIncidentsEditClearField(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Root Cause="})
 
 	if err := root.Execute(); err != nil {
@@ -435,7 +435,7 @@ func TestIncidentsEditClearTimestamp(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--timestamp", "Resolved at="})
 
 	if err := root.Execute(); err != nil {
@@ -466,7 +466,7 @@ func TestIncidentsEditTimestampParseError(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--timestamp", "Resolved at=not-a-date"})
 
 	err := root.Execute()
@@ -494,7 +494,7 @@ func TestIncidentsEditFieldNotFound(t *testing.T) {
 		}
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-1", "--field", "Nonexistent=value"})
 
 	err := root.Execute()

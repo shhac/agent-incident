@@ -5,24 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	"github.com/shhac/agent-incident/internal/api"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
-
-func newTestRoot() *cobra.Command {
-	root := &cobra.Command{
-		Use:           "agent-incident",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
-	globals := func() *shared.GlobalFlags {
-		return &shared.GlobalFlags{}
-	}
-	Register(root, globals)
-	return root
-}
 
 func TestEscalationsList(t *testing.T) {
 	var gotPath, gotMethod string
@@ -38,7 +23,7 @@ func TestEscalationsList(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"escalation", "list"})
 
 	if err := root.Execute(); err != nil {
@@ -64,7 +49,7 @@ func TestEscalationsGet(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"escalation", "get", "esc-42"})
 
 	if err := root.Execute(); err != nil {
@@ -93,7 +78,7 @@ func TestEscalationPathsList(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"escalation", "path", "list"})
 
 	if err := root.Execute(); err != nil {
@@ -119,7 +104,7 @@ func TestEscalationPathsGet(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"escalation", "path", "get", "01HRDKWWNGX330JQ4JPATH0042"})
 
 	if err := root.Execute(); err != nil {
@@ -149,7 +134,7 @@ func TestEscalationsCreate(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{
 		"escalation", "create",
 		"--incident", "inc-1",

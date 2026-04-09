@@ -5,24 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	"github.com/shhac/agent-incident/internal/api"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
-
-func newTestRoot() *cobra.Command {
-	root := &cobra.Command{
-		Use:           "agent-incident",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
-	globals := func() *shared.GlobalFlags {
-		return &shared.GlobalFlags{}
-	}
-	Register(root, globals)
-	return root
-}
 
 func TestSchedulesList(t *testing.T) {
 	var gotPath, gotMethod string
@@ -38,7 +23,7 @@ func TestSchedulesList(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"schedule", "list"})
 
 	if err := root.Execute(); err != nil {
@@ -64,7 +49,7 @@ func TestSchedulesGet(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"schedule", "get", "01HRDKZPT5Q2PAMWN5R8WY23C3"})
 
 	if err := root.Execute(); err != nil {
@@ -112,7 +97,7 @@ func TestSchedulesEntries(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{
 		"schedule", "entries", "01HRDKWWNGX330JQ4J1PERJP8Y",
 		"--from", "2026-04-09T08:00:00Z",
@@ -155,7 +140,7 @@ func TestSchedulesOverride(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{
 		"schedule", "override", "01HRDKWWNGX330JQ4J1PERJP8Y",
 		"--user", "01GF688HF8NVA17SNPGPYV5XNZ",

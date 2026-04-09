@@ -5,23 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
-
-func newTestRoot() *cobra.Command {
-	root := &cobra.Command{
-		Use:           "agent-incident",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
-	globals := func() *shared.GlobalFlags {
-		return &shared.GlobalFlags{}
-	}
-	Register(root, globals)
-	return root
-}
 
 func TestTimestampsList(t *testing.T) {
 	var gotPath, gotMethod string
@@ -37,7 +22,7 @@ func TestTimestampsList(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"timestamp", "list"})
 
 	if err := root.Execute(); err != nil {
@@ -65,7 +50,7 @@ func TestTimestampsGet(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"timestamp", "get", "ts-1"})
 
 	if err := root.Execute(); err != nil {

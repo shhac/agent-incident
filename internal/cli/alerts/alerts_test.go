@@ -6,25 +6,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	"github.com/shhac/agent-incident/internal/api"
 	"github.com/shhac/agent-incident/internal/api/testdata"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
-
-func newTestRoot() *cobra.Command {
-	root := &cobra.Command{
-		Use:           "agent-incident",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
-	globals := func() *shared.GlobalFlags {
-		return &shared.GlobalFlags{}
-	}
-	Register(root, globals)
-	return root
-}
 
 func TestAlertsList(t *testing.T) {
 	var gotPath, gotMethod string
@@ -37,7 +22,7 @@ func TestAlertsList(t *testing.T) {
 		w.Write(testdata.Load("alerts_list.json"))
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"alert", "list", "--status", "firing", "--limit", "5"})
 
 	if err := root.Execute(); err != nil {
@@ -73,7 +58,7 @@ func TestAlertsGet(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"alert", "get", "alert-99"})
 
 	if err := root.Execute(); err != nil {
@@ -101,7 +86,7 @@ func TestAlertsIncidents(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"alert", "incidents"})
 
 	if err := root.Execute(); err != nil {
@@ -134,7 +119,7 @@ func TestAlertsCreate(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"alert", "create", "--source-id", "src-abc", "--title", "New Alert", "--description", "Something happened"})
 
 	if err := root.Execute(); err != nil {

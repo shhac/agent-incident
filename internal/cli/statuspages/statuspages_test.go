@@ -5,24 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	"github.com/shhac/agent-incident/internal/api"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
-
-func newTestRoot() *cobra.Command {
-	root := &cobra.Command{
-		Use:           "agent-incident",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
-	globals := func() *shared.GlobalFlags {
-		return &shared.GlobalFlags{}
-	}
-	Register(root, globals)
-	return root
-}
 
 func TestStatusPagesList(t *testing.T) {
 	var gotPath, gotMethod string
@@ -38,7 +23,7 @@ func TestStatusPagesList(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"status-page", "list"})
 
 	if err := root.Execute(); err != nil {
@@ -66,7 +51,7 @@ func TestStatusPagesIncidentsList(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"status-page", "update", "list"})
 
 	if err := root.Execute(); err != nil {
@@ -100,7 +85,7 @@ func TestStatusPagesIncidentsCreate(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{
 		"status-page", "update", "create",
 		"--page", "01HRDKWWNGX330JQ4J1SPAGE01",
@@ -144,7 +129,7 @@ func TestStatusPagesIncidentsUpdate(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{
 		"status-page", "update", "update", "spi-1",
 		"--status", "resolved",

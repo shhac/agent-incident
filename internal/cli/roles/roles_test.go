@@ -5,25 +5,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	"github.com/shhac/agent-incident/internal/api"
 	"github.com/shhac/agent-incident/internal/api/testdata"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
-
-func newTestRoot() *cobra.Command {
-	root := &cobra.Command{
-		Use:           "agent-incident",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
-	globals := func() *shared.GlobalFlags {
-		return &shared.GlobalFlags{}
-	}
-	Register(root, globals)
-	return root
-}
 
 func TestRolesList(t *testing.T) {
 	var gotPath, gotMethod string
@@ -34,7 +19,7 @@ func TestRolesList(t *testing.T) {
 		w.Write(testdata.Load("roles_list.json"))
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"role", "list"})
 
 	if err := root.Execute(); err != nil {
@@ -60,7 +45,7 @@ func TestRolesGet(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"role", "get", "role-42"})
 
 	if err := root.Execute(); err != nil {

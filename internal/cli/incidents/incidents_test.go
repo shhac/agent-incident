@@ -7,25 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	"github.com/shhac/agent-incident/internal/api"
 	"github.com/shhac/agent-incident/internal/api/testdata"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
-
-func newTestRoot() *cobra.Command {
-	root := &cobra.Command{
-		Use:           "agent-incident",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
-	globals := func() *shared.GlobalFlags {
-		return &shared.GlobalFlags{}
-	}
-	Register(root, globals)
-	return root
-}
 
 func TestIncidentsList(t *testing.T) {
 	var gotPath, gotMethod string
@@ -38,7 +23,7 @@ func TestIncidentsList(t *testing.T) {
 		w.Write(testdata.Load("incidents_list.json"))
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "list", "--status", "active", "--limit", "10"})
 
 	if err := root.Execute(); err != nil {
@@ -68,7 +53,7 @@ func TestIncidentsGet(t *testing.T) {
 		w.Write(testdata.Load("incident_get.json"))
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "get", "01ABC123DEF456"})
 
 	if err := root.Execute(); err != nil {
@@ -104,7 +89,7 @@ func TestIncidentsCreate(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "create", "--name", "New Incident", "--summary", "Something broke"})
 
 	if err := root.Execute(); err != nil {
@@ -149,7 +134,7 @@ func TestIncidentsEdit(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "edit", "inc-edit", "--summary", "Updated summary"})
 
 	if err := root.Execute(); err != nil {
@@ -212,7 +197,7 @@ func TestNormalizeIncidentRefViaGet(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "get", "INC-2000"})
 
 	if err := root.Execute(); err != nil {
@@ -254,7 +239,7 @@ func TestIncidentsUpdates(t *testing.T) {
 		})
 	})
 
-	root := newTestRoot()
+	root := shared.NewTestRoot(Register)
 	root.SetArgs([]string{"incident", "updates", "inc-42"})
 
 	if err := root.Execute(); err != nil {
