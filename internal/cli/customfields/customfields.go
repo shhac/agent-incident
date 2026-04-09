@@ -18,7 +18,7 @@ func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 
 	registerList(cmd, globals)
 	registerGet(cmd, globals)
-	registerLLMHelp(cmd)
+	shared.RegisterLLMHelp(cmd, "Custom fields reference for LLMs", llmHelpText)
 
 	root.AddCommand(cmd)
 }

@@ -2,10 +2,9 @@ package incidents
 
 import (
 	"context"
-	"crypto/rand"
-	"fmt"
+	"strconv"
 	"strings"
-	"unicode"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -20,20 +19,11 @@ func normalizeIncidentRef(ref string) string {
 	upper := strings.ToUpper(ref)
 	if strings.HasPrefix(upper, "INC-") {
 		suffix := ref[4:]
-		if len(suffix) > 0 && allDigits(suffix) {
+		if _, err := strconv.Atoi(suffix); err == nil {
 			return suffix
 		}
 	}
 	return ref
-}
-
-func allDigits(s string) bool {
-	for _, r := range s {
-		if !unicode.IsDigit(r) {
-			return false
-		}
-	}
-	return true
 }
 
 // Register adds the incidents command group to the root command.
@@ -48,7 +38,7 @@ func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	registerCreate(incidents, globals)
 	registerEdit(incidents, globals)
 	registerUpdates(incidents, globals)
-	registerLLMHelp(incidents)
+	shared.RegisterLLMHelp(incidents, "LLM reference for incidents commands", incidentsLLMHelp)
 
 	root.AddCommand(incidents)
 }
@@ -69,16 +59,20 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
 
+			var createdAfter string
 			if since != "" {
-				if _, err := shared.ParseTime(since); err != nil {
+				t, err := shared.ParseTime(since)
+				if err != nil {
 					return err
 				}
+				createdAfter = t.Format(time.RFC3339)
 			}
 
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				opts := api.ListIncidentsOpts{
 					StatusCategory: status,
 					Severity:       severity,
+					CreatedAfter:   createdAfter,
 					PageSize:       limit,
 					After:          after,
 				}
@@ -151,7 +145,7 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 					Name:           name,
 					Summary:        summary,
 					SeverityID:     severity,
-					IdempotencyKey: newIdempotencyKey(),
+					IdempotencyKey: shared.NewIdempotencyKey(),
 				}
 				incident, err := client.CreateIncident(ctx, params)
 				if err != nil {
@@ -240,8 +234,3 @@ func registerUpdates(parent *cobra.Command, globals shared.GlobalsFunc) {
 	parent.AddCommand(cmd)
 }
 
-func newIdempotencyKey() string {
-	b := make([]byte, 16)
-	_, _ = rand.Read(b)
-	return fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:16])
-}

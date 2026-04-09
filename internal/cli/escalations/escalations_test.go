@@ -79,6 +79,61 @@ func TestEscalationsGet(t *testing.T) {
 	}
 }
 
+func TestEscalationPathsList(t *testing.T) {
+	var gotPath, gotMethod string
+
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		gotMethod = r.Method
+		json.NewEncoder(w).Encode(map[string]any{
+			"escalation_paths": []api.EscalationPath{
+				{ID: "path-1", Name: "Primary Path"},
+				{ID: "path-2", Name: "Secondary Path"},
+			},
+		})
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"escalation", "path", "list"})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if gotPath != "/v2/escalation_paths" {
+		t.Errorf("expected path /v2/escalation_paths, got %q", gotPath)
+	}
+	if gotMethod != http.MethodGet {
+		t.Errorf("expected GET, got %s", gotMethod)
+	}
+}
+
+func TestEscalationPathsGet(t *testing.T) {
+	var gotPath, gotMethod string
+
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		gotMethod = r.Method
+		json.NewEncoder(w).Encode(map[string]any{
+			"escalation_path": api.EscalationPath{ID: "path-42", Name: "Critical Path"},
+		})
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"escalation", "path", "get", "path-42"})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if gotPath != "/v2/escalation_paths/path-42" {
+		t.Errorf("expected path /v2/escalation_paths/path-42, got %q", gotPath)
+	}
+	if gotMethod != http.MethodGet {
+		t.Errorf("expected GET, got %s", gotMethod)
+	}
+}
+
 func TestEscalationsCreate(t *testing.T) {
 	var gotPath, gotMethod string
 	var gotBody map[string]any

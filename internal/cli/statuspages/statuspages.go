@@ -27,7 +27,7 @@ func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	registerIncidentsUpdate(update, globals)
 	cmd.AddCommand(update)
 
-	registerLLMHelp(cmd)
+	shared.RegisterLLMHelp(cmd, "Status pages reference for LLMs", llmHelpText)
 	root.AddCommand(cmd)
 }
 
@@ -80,7 +80,9 @@ func registerIncidentsCreate(parent *cobra.Command, globals shared.GlobalsFunc) 
 		Short: "Create a status page incident",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			if !shared.RequireFlag("page", pageID, "") || !shared.RequireFlag("name", name, "") {
+			pageOk := shared.RequireFlag("page", pageID, "")
+			nameOk := shared.RequireFlag("name", name, "")
+			if !pageOk || !nameOk {
 				return nil
 			}
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {

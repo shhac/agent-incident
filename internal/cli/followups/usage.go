@@ -1,15 +1,5 @@
 package followups
 
-import (
-	"github.com/spf13/cobra"
-
-	"github.com/shhac/agent-incident/internal/cli/shared"
-)
-
-func registerLLMHelp(parent *cobra.Command) {
-	shared.RegisterLLMHelp(parent, "Follow-ups reference for LLMs", llmHelpText)
-}
-
 const llmHelpText = `agent-incident follow-ups — Post-incident action items
 
 COMMANDS

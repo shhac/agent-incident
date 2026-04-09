@@ -3,6 +3,7 @@ package alerts
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -30,6 +31,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 	var (
 		status string
 		source string
+		since  string
 		limit  int
 		after  string
 		full   bool
@@ -40,10 +42,21 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "List alerts with optional filters",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
+
+			var createdAfter string
+			if since != "" {
+				t, err := shared.ParseTime(since)
+				if err != nil {
+					return err
+				}
+				createdAfter = t.Format(time.RFC3339)
+			}
+
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				opts := api.ListAlertsOpts{
-					PageSize: limit,
-					After:    after,
+					PageSize:     limit,
+					After:        after,
+					CreatedAfter: createdAfter,
 				}
 
 				if status != "" {
@@ -74,6 +87,7 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 	cmd.Flags().StringVar(&status, "status", "", "Filter by status (comma-separated, e.g. firing,resolved)")
 	cmd.Flags().StringVar(&source, "source", "", "Filter by deduplication key")
+	cmd.Flags().StringVar(&since, "since", "", "Only show alerts created after this time (relative or RFC3339)")
 	cmd.Flags().IntVar(&limit, "limit", 25, "Maximum number of alerts to return")
 	cmd.Flags().StringVar(&after, "after", "", "Pagination cursor")
 	cmd.Flags().BoolVar(&full, "full", false, "Show full alert details instead of compact view")

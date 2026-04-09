@@ -179,6 +179,124 @@ func TestHTTPErrorStatusCodes(t *testing.T) {
 	}
 }
 
+func TestExtractErrorMessage(t *testing.T) {
+	tests := []struct {
+		name   string
+		status int
+		body   string
+		want   string
+	}{
+		{
+			name:   "JSON errors array",
+			status: 400,
+			body:   `{"errors": ["bad request"]}`,
+			want:   "bad request",
+		},
+		{
+			name:   "JSON error field",
+			status: 404,
+			body:   `{"error": "not found"}`,
+			want:   "not found",
+		},
+		{
+			name:   "JSON message field",
+			status: 500,
+			body:   `{"message": "internal error"}`,
+			want:   "internal error",
+		},
+		{
+			name:   "non-JSON body short",
+			status: 418,
+			body:   "something went wrong",
+			want:   "HTTP 418: something went wrong",
+		},
+		{
+			name:   "non-JSON body exceeds 200 bytes",
+			status: 400,
+			body:   string(make([]byte, 201)),
+			want:   "HTTP 400",
+		},
+		{
+			name:   "empty body",
+			status: 502,
+			body:   "",
+			want:   "HTTP 502",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := extractErrorMessage(tt.status, []byte(tt.body))
+			if got != tt.want {
+				t.Errorf("extractErrorMessage(%d, %q) = %q, want %q", tt.status, tt.body, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestExtractErrorMessageViaHTTP(t *testing.T) {
+	tests := []struct {
+		name      string
+		status    int
+		body      string
+		wantInMsg string
+	}{
+		{
+			name:      "JSON errors array via do",
+			status:    422,
+			body:      `{"errors": ["bad request"]}`,
+			wantInMsg: "bad request",
+		},
+		{
+			name:      "JSON error field via do",
+			status:    404,
+			body:      `{"error": "not found"}`,
+			wantInMsg: "not found",
+		},
+		{
+			name:      "JSON message field via do",
+			status:    500,
+			body:      `{"message": "internal error"}`,
+			wantInMsg: "internal error",
+		},
+		{
+			name:      "non-JSON short body via do",
+			status:    418,
+			body:      "something went wrong",
+			wantInMsg: "HTTP 418: something went wrong",
+		},
+		{
+			name:      "empty body via do",
+			status:    502,
+			body:      "",
+			wantInMsg: "HTTP 502",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.status)
+				w.Write([]byte(tt.body))
+			}))
+			defer srv.Close()
+
+			client := NewTestClient(srv.URL, "key")
+			_, err := client.do(context.Background(), http.MethodGet, "/test", nil)
+			if err == nil {
+				t.Fatal("expected error")
+			}
+			var apiErr *agenterrors.APIError
+			if !agenterrors.As(err, &apiErr) {
+				t.Fatalf("expected APIError, got %T", err)
+			}
+			if !contains(apiErr.Message, tt.wantInMsg) {
+				t.Errorf("expected message containing %q, got %q", tt.wantInMsg, apiErr.Message)
+			}
+		})
+	}
+}
+
 func TestPOSTWithBody(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

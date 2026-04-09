@@ -1,11 +1,5 @@
 package schedules
 
-import (
-	"github.com/spf13/cobra"
-
-	"github.com/shhac/agent-incident/internal/cli/shared"
-)
-
 const schedulesLLMHelp = `# schedules domain — agent-incident CLI
 
 ## Commands
@@ -33,7 +27,3 @@ Create an override on a schedule (temporarily replace who is on-call).
 - Cover for someone: schedules override <id> --user <user-id> --from now --to now+4h
 - List all schedules: schedules list
 `
-
-func registerLLMHelp(parent *cobra.Command) {
-	shared.RegisterLLMHelp(parent, "LLM reference for schedules commands", schedulesLLMHelp)
-}

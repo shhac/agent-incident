@@ -46,6 +46,7 @@ func ToCompactAlerts(alerts []Alert) []AlertCompact {
 type ListAlertsOpts struct {
 	Status           []string
 	DeduplicationKey string
+	CreatedAfter     string // RFC3339 timestamp for created_at[gte] filter
 	PageSize         int
 	After            string
 }
@@ -73,6 +74,9 @@ func (c *Client) ListAlerts(ctx context.Context, opts ListAlertsOpts) (*ListAler
 	}
 	if opts.DeduplicationKey != "" {
 		params.Set("deduplication_key", opts.DeduplicationKey)
+	}
+	if opts.CreatedAfter != "" {
+		params.Set("created_at[gte]", opts.CreatedAfter)
 	}
 	addPaginationParams(params, opts.PageSize, opts.After)
 

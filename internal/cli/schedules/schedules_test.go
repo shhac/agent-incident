@@ -79,6 +79,48 @@ func TestSchedulesGet(t *testing.T) {
 	}
 }
 
+func TestSchedulesEntries(t *testing.T) {
+	var gotPath, gotMethod string
+	var gotQuery map[string][]string
+
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		gotMethod = r.Method
+		gotQuery = r.URL.Query()
+		json.NewEncoder(w).Encode(map[string]any{
+			"schedule_entries": []api.ScheduleEntry{
+				{
+					ScheduleID: "sched-1",
+					User:       map[string]string{"id": "user-1", "name": "Alice"},
+					StartAt:    "2026-04-09T08:00:00Z",
+					EndAt:      "2026-04-09T16:00:00Z",
+				},
+			},
+		})
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{
+		"schedule", "entries", "sched-1",
+		"--from", "2026-04-09T08:00:00Z",
+		"--to", "2026-04-09T16:00:00Z",
+	})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if gotPath != "/v2/schedule_entries" {
+		t.Errorf("expected path /v2/schedule_entries, got %q", gotPath)
+	}
+	if gotMethod != http.MethodGet {
+		t.Errorf("expected GET, got %s", gotMethod)
+	}
+	if vals := gotQuery["schedule_id"]; len(vals) == 0 || vals[0] != "sched-1" {
+		t.Errorf("expected schedule_id=sched-1, got %v", gotQuery["schedule_id"])
+	}
+}
+
 func TestSchedulesOverride(t *testing.T) {
 	var gotPath, gotMethod string
 	var gotBody map[string]any

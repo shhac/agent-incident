@@ -1,15 +1,5 @@
 package statuspages
 
-import (
-	"github.com/spf13/cobra"
-
-	"github.com/shhac/agent-incident/internal/cli/shared"
-)
-
-func registerLLMHelp(parent *cobra.Command) {
-	shared.RegisterLLMHelp(parent, "Status pages reference for LLMs", llmHelpText)
-}
-
 const llmHelpText = `agent-incident status-pages — External status page management
 
 COMMANDS

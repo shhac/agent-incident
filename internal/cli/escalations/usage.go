@@ -1,11 +1,5 @@
 package escalations
 
-import (
-	"github.com/spf13/cobra"
-
-	"github.com/shhac/agent-incident/internal/cli/shared"
-)
-
 const escalationsLLMHelp = `# escalations domain — agent-incident CLI
 
 ## Commands
@@ -33,7 +27,3 @@ Retrieve a single escalation path by ID, including the path configuration.
 - Review escalation details: escalations get <id>
 - List all escalations: escalations list
 `
-
-func registerLLMHelp(parent *cobra.Command) {
-	shared.RegisterLLMHelp(parent, "LLM reference for escalations commands", escalationsLLMHelp)
-}

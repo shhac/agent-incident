@@ -170,6 +170,59 @@ func TestIncidentsEdit(t *testing.T) {
 	}
 }
 
+func TestNormalizeIncidentRef(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"2000", "2000"},
+		{"INC-2000", "2000"},
+		{"inc-2000", "2000"},
+		{"Inc-2000", "2000"},
+		{"01ABC123DEF456", "01ABC123DEF456"},
+		{"INC-abc", "INC-abc"},
+		{"", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := normalizeIncidentRef(tt.input)
+			if got != tt.want {
+				t.Errorf("normalizeIncidentRef(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNormalizeIncidentRefViaGet(t *testing.T) {
+	var gotPath string
+
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		json.NewEncoder(w).Encode(map[string]any{
+			"incident": api.Incident{
+				ID:   "inc-2000",
+				Name: "Test",
+				Status: api.IncidentStatusRef{
+					Category: "active",
+					Name:     "Investigating",
+				},
+			},
+		})
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"incident", "get", "INC-2000"})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if gotPath != "/v2/incidents/2000" {
+		t.Errorf("expected path /v2/incidents/2000, got %q", gotPath)
+	}
+}
+
 func TestIncidentsUpdates(t *testing.T) {
 	var gotPath, gotMethod string
 	var gotQuery map[string][]string

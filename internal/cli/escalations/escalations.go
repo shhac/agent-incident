@@ -20,7 +20,7 @@ func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	registerGet(escalations, globals)
 	registerCreate(escalations, globals)
 	registerPaths(escalations, globals)
-	registerLLMHelp(escalations)
+	shared.RegisterLLMHelp(escalations, "LLM reference for escalations commands", escalationsLLMHelp)
 
 	root.AddCommand(escalations)
 }

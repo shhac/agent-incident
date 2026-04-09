@@ -88,6 +88,34 @@ func TestAlertsGet(t *testing.T) {
 	}
 }
 
+func TestAlertsIncidents(t *testing.T) {
+	var gotPath, gotMethod string
+
+	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		gotMethod = r.Method
+		json.NewEncoder(w).Encode(map[string]any{
+			"incident_alerts": []api.IncidentAlert{
+				{ID: "ia-1", AlertID: "alert-1", Title: "Alert in incident", Status: "firing"},
+			},
+		})
+	})
+
+	root := newTestRoot()
+	root.SetArgs([]string{"alert", "incidents"})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if gotPath != "/v2/incident_alerts" {
+		t.Errorf("expected path /v2/incident_alerts, got %q", gotPath)
+	}
+	if gotMethod != http.MethodGet {
+		t.Errorf("expected GET, got %s", gotMethod)
+	}
+}
+
 func TestAlertsCreate(t *testing.T) {
 	var gotPath, gotMethod string
 	var gotBody map[string]any

@@ -1,15 +1,5 @@
 package catalog
 
-import (
-	"github.com/spf13/cobra"
-
-	"github.com/shhac/agent-incident/internal/cli/shared"
-)
-
-func registerLLMHelp(parent *cobra.Command) {
-	shared.RegisterLLMHelp(parent, "Catalog reference for LLMs", llmHelpText)
-}
-
 const llmHelpText = `agent-incident catalog — Service catalog queries
 
 COMMANDS
