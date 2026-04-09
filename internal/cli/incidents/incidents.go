@@ -274,20 +274,16 @@ func parseKeyValue(s string) (string, string, error) {
 }
 
 func resolveCustomFieldEntries(ctx context.Context, client *api.Client, flags []string) ([]api.EditCustomFieldEntry, error) {
-	var allFields []api.CustomField
+	allFields, err := client.ListCustomFields(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	entries := make([]api.EditCustomFieldEntry, 0, len(flags))
 	for _, flag := range flags {
 		fieldName, value, err := parseKeyValue(flag)
 		if err != nil {
 			return nil, err
-		}
-
-		if allFields == nil {
-			allFields, err = client.ListCustomFields(ctx)
-			if err != nil {
-				return nil, err
-			}
 		}
 
 		field, err := findCustomField(fieldName, allFields)
@@ -311,29 +307,18 @@ func resolveCustomFieldEntries(ctx context.Context, client *api.Client, flags []
 }
 
 func findCustomField(name string, fields []api.CustomField) (*api.CustomField, error) {
-	lower := strings.ToLower(name)
-	for i := range fields {
-		if strings.ToLower(fields[i].Name) == lower {
-			return &fields[i], nil
-		}
+	field, err := shared.MatchByName("custom field", name, fields, func(f api.CustomField) (string, string) { return f.ID, f.Name })
+	if err != nil {
+		return nil, err
 	}
-	for i := range fields {
-		if strings.Contains(strings.ToLower(fields[i].Name), lower) {
-			return &fields[i], nil
-		}
-	}
-	names := make([]string, len(fields))
-	for i, f := range fields {
-		names[i] = f.Name
-	}
-	return nil, fmt.Errorf("custom field %q not found; available: %s", name, strings.Join(names, ", "))
+	return &field, nil
 }
 
 func buildFieldValue(ctx context.Context, client *api.Client, field *api.CustomField, value string) (api.EditCustomFieldValue, error) {
 	switch field.FieldType {
 	case "single_select", "multi_select":
 		if field.CatalogTypeID != "" {
-			entryID, err := resolveCatalogEntryID(ctx, client, field.CatalogTypeID, value)
+			entryID, err := shared.ResolveCatalogEntryID(ctx, client, field.CatalogTypeID, value)
 			if err != nil {
 				return api.EditCustomFieldValue{}, fmt.Errorf("field %q: %w", field.Name, err)
 			}
@@ -355,33 +340,6 @@ func buildFieldValue(ctx context.Context, client *api.Client, field *api.CustomF
 	default:
 		return api.EditCustomFieldValue{ValueText: value}, nil
 	}
-}
-
-func resolveCatalogEntryID(ctx context.Context, client *api.Client, catalogTypeID, value string) (string, error) {
-	if shared.LooksLikeID(value) {
-		return value, nil
-	}
-	entries, _, err := client.ListCatalogEntries(ctx, catalogTypeID, value, 25, "")
-	if err != nil {
-		return "", err
-	}
-	lower := strings.ToLower(value)
-	for _, e := range entries {
-		if strings.ToLower(e.Name) == lower {
-			return e.ID, nil
-		}
-	}
-	if len(entries) == 1 {
-		return entries[0].ID, nil
-	}
-	if len(entries) > 1 {
-		names := make([]string, len(entries))
-		for i, e := range entries {
-			names[i] = e.Name
-		}
-		return "", fmt.Errorf("ambiguous catalog entry %q matched %d results: %s", value, len(entries), strings.Join(names, ", "))
-	}
-	return "", fmt.Errorf("no catalog entry found matching %q", value)
 }
 
 func resolveTimestampValues(ctx context.Context, client *api.Client, flags []string) ([]api.EditIncidentTimestampValue, error) {

@@ -115,6 +115,17 @@ func ResolveUserID(ctx context.Context, client *api.Client, ref string) (string,
 }
 
 func matchByName[T any](kind string, ref string, items []T, extract func(T) (string, string)) (string, error) {
+	item, err := MatchByName(kind, ref, items, extract)
+	if err != nil {
+		return "", err
+	}
+	id, _ := extract(item)
+	return id, nil
+}
+
+// MatchByName resolves a name to an item from a list, using exact-then-substring matching.
+// Exported for use by domain packages that need the matched item, not just an ID.
+func MatchByName[T any](kind string, ref string, items []T, extract func(T) (string, string)) (T, error) {
 	lower := strings.ToLower(ref)
 
 	var exactMatches []T
@@ -130,22 +141,23 @@ func matchByName[T any](kind string, ref string, items []T, extract func(T) (str
 	}
 
 	if len(exactMatches) == 1 {
-		id, _ := extract(exactMatches[0])
-		return id, nil
+		return exactMatches[0], nil
 	}
 	if len(exactMatches) > 1 {
-		return "", ambiguousError(kind, ref, extractNames(exactMatches, extract))
+		var zero T
+		return zero, ambiguousError(kind, ref, extractNames(exactMatches, extract))
 	}
 
 	if len(substringMatches) == 1 {
-		id, _ := extract(substringMatches[0])
-		return id, nil
+		return substringMatches[0], nil
 	}
 	if len(substringMatches) > 1 {
-		return "", ambiguousError(kind, ref, extractNames(substringMatches, extract))
+		var zero T
+		return zero, ambiguousError(kind, ref, extractNames(substringMatches, extract))
 	}
 
-	return "", notFoundError(kind, ref)
+	var zero T
+	return zero, notFoundError(kind, ref)
 }
 
 func extractNames[T any](items []T, extract func(T) (string, string)) []string {
@@ -212,4 +224,16 @@ func ResolveCustomFieldOptionID(ref string, options []api.CustomFieldOption) (st
 		return ref, nil
 	}
 	return matchByName("custom field option", ref, options, func(o api.CustomFieldOption) (string, string) { return o.ID, o.Value })
+}
+
+// ResolveCatalogEntryID resolves a catalog entry name-or-ID to an ID within a catalog type.
+func ResolveCatalogEntryID(ctx context.Context, client *api.Client, catalogTypeID, ref string) (string, error) {
+	if looksLikeID(ref) {
+		return ref, nil
+	}
+	entries, _, err := client.ListCatalogEntries(ctx, catalogTypeID, ref, 25, "")
+	if err != nil {
+		return "", err
+	}
+	return matchByName("catalog entry", ref, entries, func(e api.CatalogEntry) (string, string) { return e.ID, e.Name })
 }
