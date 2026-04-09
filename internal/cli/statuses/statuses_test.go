@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/shhac/agent-incident/internal/api"
+	"github.com/shhac/agent-incident/internal/api/testdata"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
 
@@ -30,12 +31,7 @@ func TestStatusesList(t *testing.T) {
 	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
 		gotPath = r.URL.Path
 		gotMethod = r.Method
-		json.NewEncoder(w).Encode(map[string]any{
-			"incident_statuses": []api.IncidentStatusResource{
-				{ID: "st-1", Name: "Investigating", Category: "active", Rank: 1},
-				{ID: "st-2", Name: "Resolved", Category: "closed", Rank: 2},
-			},
-		})
+		w.Write(testdata.Load("statuses_list.json"))
 	})
 
 	root := newTestRoot()

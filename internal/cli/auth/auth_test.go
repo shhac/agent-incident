@@ -2,14 +2,13 @@ package auth
 
 import (
 	"bytes"
-	"encoding/json"
 	"net/http"
 	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
 
-	"github.com/shhac/agent-incident/internal/api"
+	"github.com/shhac/agent-incident/internal/api/testdata"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 	"github.com/shhac/agent-incident/internal/config"
 	"github.com/shhac/agent-incident/internal/credential"
@@ -67,12 +66,7 @@ func TestAuthCheck(t *testing.T) {
 	var gotPath string
 	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
 		gotPath = r.URL.Path
-		json.NewEncoder(w).Encode(map[string]any{
-			"identity": api.Identity{
-				Name:  "Test Org",
-				Roles: []string{"owner"},
-			},
-		})
+		w.Write(testdata.Load("identity.json"))
 	})
 
 	root := newTestRoot()

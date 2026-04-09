@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/shhac/agent-incident/internal/api"
+	"github.com/shhac/agent-incident/internal/api/testdata"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
 
@@ -30,12 +31,7 @@ func TestSeveritiesList(t *testing.T) {
 	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
 		gotPath = r.URL.Path
 		gotMethod = r.Method
-		json.NewEncoder(w).Encode(map[string]any{
-			"severities": []api.Severity{
-				{ID: "sev-1", Name: "Critical", Rank: 1},
-				{ID: "sev-2", Name: "Major", Rank: 2},
-			},
-		})
+		w.Write(testdata.Load("severities_list.json"))
 	})
 
 	root := newTestRoot()

@@ -1,8 +1,11 @@
 package api
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
+
+	"github.com/shhac/agent-incident/internal/api/testdata"
 )
 
 func TestTruncate(t *testing.T) {
@@ -141,6 +144,69 @@ func TestToCompact(t *testing.T) {
 		result := ToCompact(incidents)
 		if len(result[0].Name) != 200 {
 			t.Errorf("expected name length 200, got %d", len(result[0].Name))
+		}
+	})
+}
+
+func TestToCompactFromFixture(t *testing.T) {
+	data := testdata.Load("incidents_list.json")
+
+	var wrapper struct {
+		Incidents      []Incident `json:"incidents"`
+		PaginationMeta json.RawMessage `json:"pagination_meta"`
+	}
+	if err := json.Unmarshal(data, &wrapper); err != nil {
+		t.Fatalf("failed to unmarshal fixture: %v", err)
+	}
+
+	if len(wrapper.Incidents) != 2 {
+		t.Fatalf("expected 2 incidents in fixture, got %d", len(wrapper.Incidents))
+	}
+
+	compacts := ToCompact(wrapper.Incidents)
+
+	if len(compacts) != 2 {
+		t.Fatalf("expected 2 compact incidents, got %d", len(compacts))
+	}
+
+	t.Run("first incident fields", func(t *testing.T) {
+		c := compacts[0]
+		if c.ID != "01INC0ALPHAAAAAAAAAAAAAAAA" {
+			t.Errorf("ID = %q, want 01INC0ALPHAAAAAAAAAAAAAAAA", c.ID)
+		}
+		if c.Name != "API Gateway Outage" {
+			t.Errorf("Name = %q, want API Gateway Outage", c.Name)
+		}
+		if c.Status != "Closed" {
+			t.Errorf("Status = %q, want Closed", c.Status)
+		}
+		if c.Severity != "SEV-Critical" {
+			t.Errorf("Severity = %q, want SEV-Critical", c.Severity)
+		}
+		if c.CreatedAt != "2025-03-15T14:30:00.000Z" {
+			t.Errorf("CreatedAt = %q, want 2025-03-15T14:30:00.000Z", c.CreatedAt)
+		}
+		if c.IncidentLead != "Jane Smith" {
+			t.Errorf("IncidentLead = %q, want Jane Smith", c.IncidentLead)
+		}
+	})
+
+	t.Run("second incident fields", func(t *testing.T) {
+		c := compacts[1]
+		if c.ID != "01INC0BETAAAAAAAAAAAAAAAAAAA" {
+			t.Errorf("ID = %q, want 01INC0BETAAAAAAAAAAAAAAAAAAA", c.ID)
+		}
+		if c.Name != "Database Replication Lag Spike" {
+			t.Errorf("Name = %q, want Database Replication Lag Spike", c.Name)
+		}
+		if c.Status != "Investigating" {
+			t.Errorf("Status = %q, want Investigating", c.Status)
+		}
+		if c.Severity != "SEV-High" {
+			t.Errorf("Severity = %q, want SEV-High", c.Severity)
+		}
+		if c.IncidentLead != "Bob Jones" {
+			t.Errorf("IncidentLead = %q, want Bob Jones", c.IncidentLead)
 		}
 	})
 }

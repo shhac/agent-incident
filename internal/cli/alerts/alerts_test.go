@@ -5,11 +5,11 @@ import (
 	"io"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/shhac/agent-incident/internal/api"
+	"github.com/shhac/agent-incident/internal/api/testdata"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
 
@@ -34,19 +34,7 @@ func TestAlertsList(t *testing.T) {
 		gotPath = r.URL.Path
 		gotMethod = r.Method
 		gotQuery = r.URL.Query()
-		json.NewEncoder(w).Encode(map[string]any{
-			"alerts": []api.Alert{
-				{
-					ID:        "alert-1",
-					Title:     "CPU High",
-					Status:    "firing",
-					CreatedAt: time.Now(),
-				},
-			},
-			"pagination_meta": map[string]any{
-				"after": "",
-			},
-		})
+		w.Write(testdata.Load("alerts_list.json"))
 	})
 
 	root := newTestRoot()

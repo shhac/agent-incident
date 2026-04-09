@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/shhac/agent-incident/internal/api"
+	"github.com/shhac/agent-incident/internal/api/testdata"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
 
@@ -30,12 +31,7 @@ func TestRolesList(t *testing.T) {
 	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
 		gotPath = r.URL.Path
 		gotMethod = r.Method
-		json.NewEncoder(w).Encode(map[string]any{
-			"incident_roles": []api.IncidentRoleFull{
-				{ID: "role-1", Name: "Incident Lead"},
-				{ID: "role-2", Name: "Communications Lead"},
-			},
-		})
+		w.Write(testdata.Load("roles_list.json"))
 	})
 
 	root := newTestRoot()

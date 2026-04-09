@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/shhac/agent-incident/internal/api"
+	"github.com/shhac/agent-incident/internal/api/testdata"
 	"github.com/shhac/agent-incident/internal/cli/shared"
 )
 
@@ -33,22 +34,7 @@ func TestIncidentsList(t *testing.T) {
 		gotPath = r.URL.Path
 		gotMethod = r.Method
 		gotQuery = r.URL.Query()
-		json.NewEncoder(w).Encode(map[string]any{
-			"incidents": []api.Incident{
-				{
-					ID:   "inc-1",
-					Name: "Test Incident",
-					Status: api.IncidentStatusRef{
-						Category: "active",
-						Name:     "Investigating",
-					},
-					CreatedAt: "2024-01-01T00:00:00Z",
-				},
-			},
-			"pagination_meta": map[string]any{
-				"after": "cursor-abc",
-			},
-		})
+		w.Write(testdata.Load("incidents_list.json"))
 	})
 
 	root := newTestRoot()
@@ -78,16 +64,7 @@ func TestIncidentsGet(t *testing.T) {
 	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
 		gotPath = r.URL.Path
 		gotMethod = r.Method
-		json.NewEncoder(w).Encode(map[string]any{
-			"incident": api.Incident{
-				ID:   "01ABC123DEF456",
-				Name: "Specific Incident",
-				Status: api.IncidentStatusRef{
-					Category: "active",
-					Name:     "Investigating",
-				},
-			},
-		})
+		w.Write(testdata.Load("incident_get.json"))
 	})
 
 	root := newTestRoot()
