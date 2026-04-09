@@ -24,9 +24,14 @@ Create a new incident.
 
 ### incidents edit <id-or-reference>
 Edit an existing incident (accepts INC-2000, 2000, or UUID).
-  --status    New incident status
-  --severity  New severity ID
-  --summary   Updated summary
+  --name       New incident name
+  --status     New incident status (name or ID, e.g. "Closed", "Investigating")
+  --severity   Severity (name or ID, e.g. "Critical", "SEV1")
+  --summary    Updated summary
+  --field      Set custom field value (repeatable): "Field Name=value"
+               For select fields, resolves option names. Empty value clears the field.
+  --timestamp  Set timestamp value (repeatable): "Reported at=2026-04-09T15:00:00Z"
+               Supports relative times (now, now-1h), RFC3339, unix epoch. Empty value clears.
 
 ### incidents updates <id>
 List status updates posted to an incident.
@@ -46,6 +51,15 @@ Use --full to get complete incident objects with all nested data.
 - List active incidents: incidents list --status active
 - Get incident details: incidents get <id>
 - Create and triage: incidents create --name "..." --severity <sev_id>
-- Update status: incidents edit <id> --summary "Update: ..."
+- Update status: incidents edit <id> --status Closed --summary "Resolved: ..."
+- Set severity by name: incidents edit <id> --severity Critical
+- Set custom fields: incidents edit <id> --field "Affected Team=Platform" --field "Root Cause=DNS"
+- Set timestamps: incidents edit <id> --timestamp "Resolved at=2026-04-09T15:30:00Z"
 - Review timeline: incidents updates <id>
+
+## Discovering Valid Values
+- Severities: ref severity list
+- Statuses: ref status list
+- Custom fields and options: ref custom-field list
+- Timestamp definitions: ref timestamp list
 `

@@ -18,6 +18,11 @@ func looksLikeID(s string) bool {
 	return ulidPattern.MatchString(s)
 }
 
+// LooksLikeID is the exported version for use by other packages.
+func LooksLikeID(s string) bool {
+	return looksLikeID(s)
+}
+
 func ambiguousError(kind string, query string, names []string) error {
 	return agenterrors.Newf(agenterrors.FixableByAgent,
 		"ambiguous %s %q matched %d results", kind, query, len(names)).
@@ -150,4 +155,61 @@ func extractNames[T any](items []T, extract func(T) (string, string)) []string {
 		names[i] = name
 	}
 	return names
+}
+
+// ResolveSeverityID resolves a severity name-or-ID to an ID.
+func ResolveSeverityID(ctx context.Context, client *api.Client, ref string) (string, error) {
+	if looksLikeID(ref) {
+		return ref, nil
+	}
+	severities, err := client.ListSeverities(ctx)
+	if err != nil {
+		return "", err
+	}
+	return matchByName("severity", ref, severities, func(s api.Severity) (string, string) { return s.ID, s.Name })
+}
+
+// ResolveIncidentStatusID resolves an incident status name-or-ID to an ID.
+func ResolveIncidentStatusID(ctx context.Context, client *api.Client, ref string) (string, error) {
+	if looksLikeID(ref) {
+		return ref, nil
+	}
+	statuses, err := client.ListIncidentStatuses(ctx)
+	if err != nil {
+		return "", err
+	}
+	return matchByName("status", ref, statuses, func(s api.IncidentStatusResource) (string, string) { return s.ID, s.Name })
+}
+
+// ResolveCustomFieldID resolves a custom field name-or-ID to an ID.
+func ResolveCustomFieldID(ctx context.Context, client *api.Client, ref string) (string, error) {
+	if looksLikeID(ref) {
+		return ref, nil
+	}
+	fields, err := client.ListCustomFields(ctx)
+	if err != nil {
+		return "", err
+	}
+	return matchByName("custom field", ref, fields, func(f api.CustomField) (string, string) { return f.ID, f.Name })
+}
+
+// ResolveIncidentTimestampID resolves a timestamp name-or-ID to an ID.
+func ResolveIncidentTimestampID(ctx context.Context, client *api.Client, ref string) (string, error) {
+	if looksLikeID(ref) {
+		return ref, nil
+	}
+	timestamps, err := client.ListIncidentTimestamps(ctx)
+	if err != nil {
+		return "", err
+	}
+	return matchByName("timestamp", ref, timestamps, func(t api.IncidentTimestampResource) (string, string) { return t.ID, t.Name })
+}
+
+// ResolveCustomFieldOptionID resolves a custom field option value-or-ID to an ID
+// for single/multi-select fields.
+func ResolveCustomFieldOptionID(ref string, options []api.CustomFieldOption) (string, error) {
+	if looksLikeID(ref) {
+		return ref, nil
+	}
+	return matchByName("custom field option", ref, options, func(o api.CustomFieldOption) (string, string) { return o.ID, o.Value })
 }

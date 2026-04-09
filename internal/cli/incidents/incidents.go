@@ -2,6 +2,7 @@ package incidents
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -185,9 +186,12 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 	var (
-		name     string
-		severity string
-		summary  string
+		name       string
+		severity   string
+		status     string
+		summary    string
+		fieldFlags []string
+		tsFlags    []string
 	)
 
 	cmd := &cobra.Command{
@@ -201,11 +205,40 @@ func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 				if cmd.Flags().Changed("name") {
 					fields.Name = &name
 				}
-				if cmd.Flags().Changed("severity") {
-					fields.SeverityID = &severity
-				}
 				if cmd.Flags().Changed("summary") {
 					fields.Summary = &summary
+				}
+
+				if cmd.Flags().Changed("severity") {
+					sevID, err := shared.ResolveSeverityID(ctx, client, severity)
+					if err != nil {
+						return err
+					}
+					fields.SeverityID = &sevID
+				}
+
+				if cmd.Flags().Changed("status") {
+					statusID, err := shared.ResolveIncidentStatusID(ctx, client, status)
+					if err != nil {
+						return err
+					}
+					fields.IncidentStatusID = &statusID
+				}
+
+				if len(fieldFlags) > 0 {
+					entries, err := resolveCustomFieldEntries(ctx, client, fieldFlags)
+					if err != nil {
+						return err
+					}
+					fields.CustomFieldEntries = entries
+				}
+
+				if len(tsFlags) > 0 {
+					tsValues, err := resolveTimestampValues(ctx, client, tsFlags)
+					if err != nil {
+						return err
+					}
+					fields.IncidentTimestampValues = tsValues
 				}
 
 				params := api.EditIncidentParams{Incident: fields}
@@ -224,9 +257,160 @@ func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 	}
 
 	cmd.Flags().StringVar(&name, "name", "", "New incident name")
-	cmd.Flags().StringVar(&severity, "severity", "", "New severity ID")
+	cmd.Flags().StringVar(&severity, "severity", "", "Severity (name or ID)")
+	cmd.Flags().StringVar(&status, "status", "", "Incident status (name or ID)")
 	cmd.Flags().StringVar(&summary, "summary", "", "Updated summary")
+	cmd.Flags().StringArrayVar(&fieldFlags, "field", nil, `Set custom field value (repeatable): "Field Name=value"`)
+	cmd.Flags().StringArrayVar(&tsFlags, "timestamp", nil, `Set timestamp value (repeatable): "Reported at=2026-04-09T15:00:00Z"`)
 	parent.AddCommand(cmd)
+}
+
+func parseKeyValue(s string) (string, string, error) {
+	idx := strings.IndexByte(s, '=')
+	if idx < 0 {
+		return "", "", fmt.Errorf("expected Name=Value format, got %q", s)
+	}
+	return s[:idx], s[idx+1:], nil
+}
+
+func resolveCustomFieldEntries(ctx context.Context, client *api.Client, flags []string) ([]api.EditCustomFieldEntry, error) {
+	var allFields []api.CustomField
+
+	entries := make([]api.EditCustomFieldEntry, 0, len(flags))
+	for _, flag := range flags {
+		fieldName, value, err := parseKeyValue(flag)
+		if err != nil {
+			return nil, err
+		}
+
+		if allFields == nil {
+			allFields, err = client.ListCustomFields(ctx)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		field, err := findCustomField(fieldName, allFields)
+		if err != nil {
+			return nil, err
+		}
+
+		entry := api.EditCustomFieldEntry{CustomFieldID: field.ID}
+		if value == "" {
+			entry.Values = []api.EditCustomFieldValue{}
+		} else {
+			v, err := buildFieldValue(ctx, client, field, value)
+			if err != nil {
+				return nil, err
+			}
+			entry.Values = []api.EditCustomFieldValue{v}
+		}
+		entries = append(entries, entry)
+	}
+	return entries, nil
+}
+
+func findCustomField(name string, fields []api.CustomField) (*api.CustomField, error) {
+	lower := strings.ToLower(name)
+	for i := range fields {
+		if strings.ToLower(fields[i].Name) == lower {
+			return &fields[i], nil
+		}
+	}
+	for i := range fields {
+		if strings.Contains(strings.ToLower(fields[i].Name), lower) {
+			return &fields[i], nil
+		}
+	}
+	names := make([]string, len(fields))
+	for i, f := range fields {
+		names[i] = f.Name
+	}
+	return nil, fmt.Errorf("custom field %q not found; available: %s", name, strings.Join(names, ", "))
+}
+
+func buildFieldValue(ctx context.Context, client *api.Client, field *api.CustomField, value string) (api.EditCustomFieldValue, error) {
+	switch field.FieldType {
+	case "single_select", "multi_select":
+		if field.CatalogTypeID != "" {
+			entryID, err := resolveCatalogEntryID(ctx, client, field.CatalogTypeID, value)
+			if err != nil {
+				return api.EditCustomFieldValue{}, fmt.Errorf("field %q: %w", field.Name, err)
+			}
+			return api.EditCustomFieldValue{ValueCatalogEntryID: entryID}, nil
+		}
+		options, _, err := client.ListCustomFieldOptions(ctx, field.ID, 250, "")
+		if err != nil {
+			return api.EditCustomFieldValue{}, fmt.Errorf("field %q: %w", field.Name, err)
+		}
+		optID, err := shared.ResolveCustomFieldOptionID(value, options)
+		if err != nil {
+			return api.EditCustomFieldValue{}, fmt.Errorf("field %q: %w", field.Name, err)
+		}
+		return api.EditCustomFieldValue{ValueOptionID: optID}, nil
+	case "numeric":
+		return api.EditCustomFieldValue{ValueNumeric: value}, nil
+	case "link":
+		return api.EditCustomFieldValue{ValueLink: value}, nil
+	default:
+		return api.EditCustomFieldValue{ValueText: value}, nil
+	}
+}
+
+func resolveCatalogEntryID(ctx context.Context, client *api.Client, catalogTypeID, value string) (string, error) {
+	if shared.LooksLikeID(value) {
+		return value, nil
+	}
+	entries, _, err := client.ListCatalogEntries(ctx, catalogTypeID, value, 25, "")
+	if err != nil {
+		return "", err
+	}
+	lower := strings.ToLower(value)
+	for _, e := range entries {
+		if strings.ToLower(e.Name) == lower {
+			return e.ID, nil
+		}
+	}
+	if len(entries) == 1 {
+		return entries[0].ID, nil
+	}
+	if len(entries) > 1 {
+		names := make([]string, len(entries))
+		for i, e := range entries {
+			names[i] = e.Name
+		}
+		return "", fmt.Errorf("ambiguous catalog entry %q matched %d results: %s", value, len(entries), strings.Join(names, ", "))
+	}
+	return "", fmt.Errorf("no catalog entry found matching %q", value)
+}
+
+func resolveTimestampValues(ctx context.Context, client *api.Client, flags []string) ([]api.EditIncidentTimestampValue, error) {
+	values := make([]api.EditIncidentTimestampValue, 0, len(flags))
+	for _, flag := range flags {
+		tsName, tsValue, err := parseKeyValue(flag)
+		if err != nil {
+			return nil, err
+		}
+
+		tsID, err := shared.ResolveIncidentTimestampID(ctx, client, tsName)
+		if err != nil {
+			return nil, err
+		}
+
+		entry := api.EditIncidentTimestampValue{IncidentTimestampID: tsID}
+		if tsValue == "" {
+			entry.Value = nil
+		} else {
+			t, err := shared.ParseTime(tsValue)
+			if err != nil {
+				return nil, fmt.Errorf("timestamp %q: %w", tsName, err)
+			}
+			iso := t.UTC().Format("2006-01-02T15:04:05Z")
+			entry.Value = &iso
+		}
+		values = append(values, entry)
+	}
+	return values, nil
 }
 
 func registerUpdates(parent *cobra.Command, globals shared.GlobalsFunc) {

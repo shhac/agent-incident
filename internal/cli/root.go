@@ -20,6 +20,7 @@ import (
 	"github.com/shhac/agent-incident/internal/cli/shared"
 	"github.com/shhac/agent-incident/internal/cli/statuses"
 	"github.com/shhac/agent-incident/internal/cli/statuspages"
+	"github.com/shhac/agent-incident/internal/cli/timestamps"
 	"github.com/shhac/agent-incident/internal/cli/users"
 )
 
@@ -80,13 +81,14 @@ func newRootCmd(version string) *cobra.Command {
 	// Reference data
 	ref := &cobra.Command{
 		Use:   "ref",
-		Short: "Reference data lookups (severities, statuses, roles, users, fields, catalog)",
+		Short: "Reference data lookups (severities, statuses, roles, users, fields, timestamps, catalog)",
 	}
 	severities.Register(ref, allGlobals)
 	statuses.Register(ref, allGlobals)
 	roles.Register(ref, allGlobals)
 	users.Register(ref, allGlobals)
 	customfields.Register(ref, allGlobals)
+	timestamps.Register(ref, allGlobals)
 	catalog.Register(ref, allGlobals)
 	root.AddCommand(ref)
 
