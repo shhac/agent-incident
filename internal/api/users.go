@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type User struct {
@@ -52,12 +51,7 @@ func (c *Client) ListUsers(ctx context.Context, query string, pageSize int, afte
 	if query != "" {
 		params.Set("query", query)
 	}
-	if pageSize > 0 {
-		params.Set("page_size", strconv.Itoa(pageSize))
-	}
-	if after != "" {
-		params.Set("after", after)
-	}
+	addPaginationParams(params, pageSize, after)
 	path := buildPath("/v2/users", params)
 	result, err := doAndDecode[usersWrapper](c, ctx, http.MethodGet, path, nil)
 	if err != nil {

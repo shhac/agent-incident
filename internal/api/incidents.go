@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"time"
 )
 
@@ -155,12 +154,7 @@ func (c *Client) ListIncidents(ctx context.Context, opts ListIncidentsOpts) ([]I
 	for _, sev := range opts.Severity {
 		params.Add("severity[]", sev)
 	}
-	if opts.PageSize > 0 {
-		params.Set("page_size", strconv.Itoa(opts.PageSize))
-	}
-	if opts.After != "" {
-		params.Set("after", opts.After)
-	}
+	addPaginationParams(params, opts.PageSize, opts.After)
 
 	path := buildPath("/v2/incidents", params)
 	resp, err := doAndDecode[incidentsWrapper](c, ctx, http.MethodGet, path, nil)
@@ -168,11 +162,7 @@ func (c *Client) ListIncidents(ctx context.Context, opts ListIncidentsOpts) ([]I
 		return nil, "", err
 	}
 
-	var cursor string
-	if resp.PaginationMeta != nil {
-		cursor = resp.PaginationMeta.After
-	}
-	return resp.Incidents, cursor, nil
+	return resp.Incidents, extractCursor(resp.PaginationMeta), nil
 }
 
 func (c *Client) GetIncident(ctx context.Context, id string) (*Incident, error) {
@@ -231,12 +221,7 @@ type incidentUpdatesWrapper struct {
 func (c *Client) ListIncidentUpdates(ctx context.Context, incidentID string, pageSize int, after string) ([]IncidentUpdate, string, error) {
 	params := url.Values{}
 	params.Set("incident_id", incidentID)
-	if pageSize > 0 {
-		params.Set("page_size", strconv.Itoa(pageSize))
-	}
-	if after != "" {
-		params.Set("after", after)
-	}
+	addPaginationParams(params, pageSize, after)
 
 	path := buildPath("/v2/incident_updates", params)
 	resp, err := doAndDecode[incidentUpdatesWrapper](c, ctx, http.MethodGet, path, nil)
@@ -244,9 +229,5 @@ func (c *Client) ListIncidentUpdates(ctx context.Context, incidentID string, pag
 		return nil, "", err
 	}
 
-	var cursor string
-	if resp.PaginationMeta != nil {
-		cursor = resp.PaginationMeta.After
-	}
-	return resp.IncidentUpdates, cursor, nil
+	return resp.IncidentUpdates, extractCursor(resp.PaginationMeta), nil
 }

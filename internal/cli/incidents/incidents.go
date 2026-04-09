@@ -145,7 +145,7 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 	var (
-		status   string
+		name     string
 		severity string
 		summary  string
 	)
@@ -158,8 +158,8 @@ func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 			g := globals()
 			return shared.WithClient(g.APIKey, g.Org, g.Timeout, func(ctx context.Context, client *api.Client) error {
 				fields := api.EditIncidentFields{}
-				if cmd.Flags().Changed("status") {
-					fields.Name = &status
+				if cmd.Flags().Changed("name") {
+					fields.Name = &name
 				}
 				if cmd.Flags().Changed("severity") {
 					fields.SeverityID = &severity
@@ -179,7 +179,7 @@ func registerEdit(parent *cobra.Command, globals shared.GlobalsFunc) {
 		},
 	}
 
-	cmd.Flags().StringVar(&status, "status", "", "New incident status")
+	cmd.Flags().StringVar(&name, "name", "", "New incident name")
 	cmd.Flags().StringVar(&severity, "severity", "", "New severity ID")
 	cmd.Flags().StringVar(&summary, "summary", "", "Updated summary")
 	parent.AddCommand(cmd)

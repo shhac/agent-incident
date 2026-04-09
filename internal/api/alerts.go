@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"time"
 )
 
@@ -75,12 +74,7 @@ func (c *Client) ListAlerts(ctx context.Context, opts ListAlertsOpts) (*ListAler
 	if opts.DeduplicationKey != "" {
 		params.Set("deduplication_key", opts.DeduplicationKey)
 	}
-	if opts.PageSize > 0 {
-		params.Set("page_size", strconv.Itoa(opts.PageSize))
-	}
-	if opts.After != "" {
-		params.Set("after", opts.After)
-	}
+	addPaginationParams(params, opts.PageSize, opts.After)
 
 	path := buildPath("/v2/alerts", params)
 	w, err := doAndDecode[alertsWrapper](c, ctx, http.MethodGet, path, nil)
@@ -89,7 +83,7 @@ func (c *Client) ListAlerts(ctx context.Context, opts ListAlertsOpts) (*ListAler
 	}
 	return &ListAlertsResult{
 		Alerts: w.Alerts,
-		After:  w.PaginationMeta.After,
+		After:  extractCursor(&w.PaginationMeta),
 	}, nil
 }
 
@@ -142,12 +136,7 @@ type ListIncidentAlertsResult struct {
 // ListIncidentAlerts returns alerts that are attached to incidents.
 func (c *Client) ListIncidentAlerts(ctx context.Context, pageSize int, after string) (*ListIncidentAlertsResult, error) {
 	params := url.Values{}
-	if pageSize > 0 {
-		params.Set("page_size", strconv.Itoa(pageSize))
-	}
-	if after != "" {
-		params.Set("after", after)
-	}
+	addPaginationParams(params, pageSize, after)
 
 	path := buildPath("/v2/incident_alerts", params)
 	w, err := doAndDecode[incidentAlertsWrapper](c, ctx, http.MethodGet, path, nil)
@@ -156,6 +145,6 @@ func (c *Client) ListIncidentAlerts(ctx context.Context, pageSize int, after str
 	}
 	return &ListIncidentAlertsResult{
 		IncidentAlerts: w.IncidentAlerts,
-		After:          w.PaginationMeta.After,
+		After:          extractCursor(&w.PaginationMeta),
 	}, nil
 }

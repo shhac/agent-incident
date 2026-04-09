@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type Action struct {
@@ -32,21 +31,12 @@ func (c *Client) ListActions(ctx context.Context, incidentID string, pageSize in
 	if incidentID != "" {
 		params.Set("incident_id", incidentID)
 	}
-	if pageSize > 0 {
-		params.Set("page_size", strconv.Itoa(pageSize))
-	}
-	if after != "" {
-		params.Set("after", after)
-	}
+	addPaginationParams(params, pageSize, after)
 	result, err := doAndDecode[actionsWrapper](c, ctx, http.MethodGet, buildPath("/v2/actions", params), nil)
 	if err != nil {
 		return nil, "", err
 	}
-	cursor := ""
-	if result.PaginationMeta != nil {
-		cursor = result.PaginationMeta.After
-	}
-	return result.Actions, cursor, nil
+	return result.Actions, extractCursor(result.PaginationMeta), nil
 }
 
 func (c *Client) GetAction(ctx context.Context, id string) (*Action, error) {

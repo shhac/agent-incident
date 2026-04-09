@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"fmt"
+	"context"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -76,69 +76,22 @@ func registerCheck(parent *cobra.Command) {
 				alias = args[0]
 			}
 
-			// Resolve which credential to check
-			var apiKey string
-			if alias != "" {
-				cred, err := credential.Get(alias)
+			return shared.WithClient("", alias, 0, func(ctx context.Context, client *api.Client) error {
+				identity, err := client.GetIdentity(ctx)
 				if err != nil {
-					output.WriteError(os.Stderr, err)
-					return nil
+					return err
 				}
-				apiKey = cred.APIKey
-			} else {
-				// Try env first, then default org
-				apiKey = os.Getenv("INCIDENT_API_KEY")
-				if apiKey == "" {
-					cfg := config.Read()
-					if cfg.DefaultOrg == "" {
-						output.WriteError(os.Stderr, fmt.Errorf("no alias specified and no default organization configured"))
-						return nil
-					}
-					alias = cfg.DefaultOrg
-					cred, err := credential.Get(alias)
-					if err != nil {
-						output.WriteError(os.Stderr, err)
-						return nil
-					}
-					apiKey = cred.APIKey
+
+				result := map[string]any{
+					"status":   "ok",
+					"identity": identity,
 				}
-			}
-
-			var client *api.Client
-			if apiURL := os.Getenv("INCIDENT_API_URL"); apiURL != "" {
-				client = api.NewTestClient(apiURL, apiKey)
-			} else {
-				client = api.NewClient(apiKey)
-			}
-
-			// Use ClientFactory for test injection
-			if shared.ClientFactory != nil {
-				var err error
-				client, err = shared.ClientFactory()
-				if err != nil {
-					output.WriteError(os.Stderr, err)
-					return nil
+				if alias != "" {
+					result["alias"] = alias
 				}
-			}
-
-			ctx, cancel := shared.MakeContext(0)
-			defer cancel()
-
-			identity, err := client.GetIdentity(ctx)
-			if err != nil {
-				output.WriteError(os.Stderr, err)
+				shared.WriteItem(result, "")
 				return nil
-			}
-
-			result := map[string]any{
-				"status":   "ok",
-				"identity": identity,
-			}
-			if alias != "" {
-				result["alias"] = alias
-			}
-			shared.WriteItem(result, "")
-			return nil
+			})
 		},
 	}
 	parent.AddCommand(cmd)

@@ -54,39 +54,42 @@ func PrintJSON(data any, prune bool) {
 	printJSON(data, prune)
 }
 
-func printJSON(data any, prune bool) {
+// toCleanAny round-trips data through JSON to get a generic any value,
+// optionally pruning null fields.
+func toCleanAny(data any, prune bool) (any, bool) {
 	b, err := json.Marshal(data)
 	if err != nil {
-		return
+		return nil, false
 	}
 	var decoded any
 	if err := json.Unmarshal(b, &decoded); err != nil {
-		return
+		return nil, false
 	}
 	if prune {
 		decoded = pruneNulls(decoded)
 	}
+	return decoded, true
+}
+
+func printJSON(data any, prune bool) {
+	cleaned, ok := toCleanAny(data, prune)
+	if !ok {
+		return
+	}
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
 	enc.SetEscapeHTML(false)
-	_ = enc.Encode(decoded)
+	_ = enc.Encode(cleaned)
 }
 
 func printYAML(data any, prune bool) {
-	b, err := json.Marshal(data)
-	if err != nil {
+	cleaned, ok := toCleanAny(data, prune)
+	if !ok {
 		return
-	}
-	var m any
-	if err := json.Unmarshal(b, &m); err != nil {
-		return
-	}
-	if prune {
-		m = pruneNulls(m)
 	}
 	enc := yaml.NewEncoder(os.Stdout)
 	enc.SetIndent(2)
-	_ = enc.Encode(m)
+	_ = enc.Encode(cleaned)
 }
 
 func WriteError(w io.Writer, err error) {

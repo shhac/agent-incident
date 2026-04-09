@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	agenterrors "github.com/shhac/agent-incident/internal/errors"
 )
@@ -99,6 +100,22 @@ func doAndDecodeField[W any, T any](c *Client, ctx context.Context, method, path
 type paginationMeta struct {
 	After        string `json:"after,omitempty"`
 	TotalRecords int    `json:"total_record_count,omitempty"`
+}
+
+func extractCursor(meta *paginationMeta) string {
+	if meta != nil {
+		return meta.After
+	}
+	return ""
+}
+
+func addPaginationParams(params url.Values, pageSize int, after string) {
+	if pageSize > 0 {
+		params.Set("page_size", strconv.Itoa(pageSize))
+	}
+	if after != "" {
+		params.Set("after", after)
+	}
 }
 
 func buildPath(base string, params url.Values) string {

@@ -52,11 +52,13 @@ func Read() *Config {
 	}
 	data, err := os.ReadFile(configPath())
 	if err != nil {
-		return defaultConfig()
+		cache = defaultConfig()
+		return cache
 	}
 	var cfg Config
 	if err := json.Unmarshal(data, &cfg); err != nil {
-		return defaultConfig()
+		cache = defaultConfig()
+		return cache
 	}
 	if cfg.Organizations == nil {
 		cfg.Organizations = make(map[string]Organization)
@@ -88,11 +90,9 @@ func ClearCache() {
 }
 
 func defaultConfig() *Config {
-	cfg := &Config{
+	return &Config{
 		Organizations: make(map[string]Organization),
 	}
-	cache = cfg
-	return cfg
 }
 
 func StoreOrganization(alias string) error {

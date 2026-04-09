@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type FollowUp struct {
@@ -33,21 +32,12 @@ func (c *Client) ListFollowUps(ctx context.Context, incidentID string, pageSize 
 	if incidentID != "" {
 		params.Set("incident_id", incidentID)
 	}
-	if pageSize > 0 {
-		params.Set("page_size", strconv.Itoa(pageSize))
-	}
-	if after != "" {
-		params.Set("after", after)
-	}
+	addPaginationParams(params, pageSize, after)
 	result, err := doAndDecode[followUpsWrapper](c, ctx, http.MethodGet, buildPath("/v2/follow_ups", params), nil)
 	if err != nil {
 		return nil, "", err
 	}
-	cursor := ""
-	if result.PaginationMeta != nil {
-		cursor = result.PaginationMeta.After
-	}
-	return result.FollowUps, cursor, nil
+	return result.FollowUps, extractCursor(result.PaginationMeta), nil
 }
 
 func (c *Client) GetFollowUp(ctx context.Context, id string) (*FollowUp, error) {

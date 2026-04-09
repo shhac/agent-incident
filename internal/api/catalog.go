@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type CatalogType struct {
@@ -71,21 +70,12 @@ func (c *Client) ListCatalogEntries(ctx context.Context, typeID, query string, p
 	if query != "" {
 		params.Set("name_contains", query)
 	}
-	if pageSize > 0 {
-		params.Set("page_size", strconv.Itoa(pageSize))
-	}
-	if after != "" {
-		params.Set("after", after)
-	}
+	addPaginationParams(params, pageSize, after)
 	result, err := doAndDecode[catalogEntriesWrapper](c, ctx, http.MethodGet, buildPath("/v2/catalog_entries", params), nil)
 	if err != nil {
 		return nil, "", err
 	}
-	cursor := ""
-	if result.PaginationMeta != nil {
-		cursor = result.PaginationMeta.After
-	}
-	return result.CatalogEntries, cursor, nil
+	return result.CatalogEntries, extractCursor(result.PaginationMeta), nil
 }
 
 func (c *Client) GetCatalogEntry(ctx context.Context, id string) (*CatalogEntry, error) {

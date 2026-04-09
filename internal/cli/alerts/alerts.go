@@ -30,7 +30,6 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 	var (
 		status string
 		source string
-		since  string
 		limit  int
 		after  string
 		full   bool
@@ -54,14 +53,6 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 					opts.DeduplicationKey = source
 				}
 
-				if since != "" {
-					sinceTime, err := shared.ParseTime(since)
-					if err != nil {
-						return err
-					}
-					_ = sinceTime // incident.io v2 alerts API filters by status, not time; kept for future use
-				}
-
 				result, err := client.ListAlerts(ctx, opts)
 				if err != nil {
 					return err
@@ -83,7 +74,6 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 	cmd.Flags().StringVar(&status, "status", "", "Filter by status (comma-separated, e.g. firing,resolved)")
 	cmd.Flags().StringVar(&source, "source", "", "Filter by deduplication key")
-	cmd.Flags().StringVar(&since, "since", "", "Filter alerts created after this time (relative or RFC3339)")
 	cmd.Flags().IntVar(&limit, "limit", 25, "Maximum number of alerts to return")
 	cmd.Flags().StringVar(&after, "after", "", "Pagination cursor")
 	cmd.Flags().BoolVar(&full, "full", false, "Show full alert details instead of compact view")
