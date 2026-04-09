@@ -1,0 +1,26 @@
+.DS_Store
+.env
+.env.*
+
+# go
+/agent-incident
+vendor/
+
+# build
+dist
+release
+
+# local
+.cache
+.tmp
+.ai-cache
+
+# claude
+.claude/*.local.json
+CLAUDE.local.md
+
+# design docs
+design-docs/
+
+# api spec
+incident-openapi-v3.json
