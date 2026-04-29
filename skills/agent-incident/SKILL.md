@@ -1,17 +1,7 @@
 ---
 name: agent-incident
-description: Triage and manage incident.io incidents, alerts, schedules, escalations, and status pages. Use when the user asks about active incidents, who's on-call, alert status, escalating to responders, incident severity, follow-up actions, or status page updates.
-triggers:
-  - incident
-  - on-call
-  - escalation
-  - alert
-  - severity
-  - status page
-  - schedule
-  - pager
-  - follow-up
-allowed-tools: Bash Read Grep Glob
+description: Triage and manage incident.io incidents, alerts, schedules, escalations, and status pages. Use when the user asks about active incidents, who's on-call, alert status, escalating to responders, incident severity, follow-up actions, pager schedules, or status page updates.
+allowed-tools: Bash(agent-incident *) Read Grep Glob
 ---
 
 # agent-incident — incident.io Triage CLI
