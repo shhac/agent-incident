@@ -452,8 +452,8 @@ func TestIncidentsEditClearTimestamp(t *testing.T) {
 
 func TestIncidentsEditTimestampParseError(t *testing.T) {
 	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
-		switch {
-		case r.URL.Path == "/v2/incident_timestamps":
+		switch r.URL.Path {
+		case "/v2/incident_timestamps":
 			json.NewEncoder(w).Encode(map[string]any{
 				"incident_timestamps": []map[string]any{
 					{"id": "ts-resolved", "name": "Resolved at", "rank": 5},
@@ -480,8 +480,8 @@ func TestIncidentsEditTimestampParseError(t *testing.T) {
 
 func TestIncidentsEditFieldNotFound(t *testing.T) {
 	shared.SetupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
-		switch {
-		case r.URL.Path == "/v2/custom_fields":
+		switch r.URL.Path {
+		case "/v2/custom_fields":
 			json.NewEncoder(w).Encode(map[string]any{
 				"custom_fields": []map[string]any{
 					{"id": "cf-cause", "name": "Root Cause", "field_type": "text"},
