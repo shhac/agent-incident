@@ -1,6 +1,6 @@
 package statuspages
 
-const llmHelpText = `agent-incident status-pages — External status page management
+const usageText = `agent-incident status-pages — External status page management
 
 COMMANDS
   status-pages list

@@ -1,6 +1,6 @@
 package users
 
-const llmHelpText = `agent-incident users — incident.io user management
+const usageText = `agent-incident users — incident.io user management
 
 COMMANDS
   agent-incident users list               List users (compact view by default)

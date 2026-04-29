@@ -1,6 +1,6 @@
 package customfields
 
-const llmHelpText = `agent-incident custom-fields — Custom field reference
+const usageText = `agent-incident custom-fields — Custom field reference
 
 COMMANDS
   custom-fields list

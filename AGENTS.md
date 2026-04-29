@@ -55,7 +55,7 @@ internal/output/               → JSON/YAML/NDJSON formatting, null pruning
 
 When adding or changing commands, flags, or features, always update:
 - **`internal/cli/<domain>/usage.go`** — LLM help text for the domain
-- **`internal/cli/usage.go`** — top-level `llm-help` reference card
+- **`internal/cli/usage.go`** — top-level `usage` reference card
 - **`README.md`** — command map and examples (if user-facing structure changed)
 - **`skills/agent-incident/SKILL.md`** — quick reference, discovery commands, workflow examples
 

@@ -7,9 +7,9 @@ import (
 
 // Identity represents the response from GET /v1/identity.
 type Identity struct {
-	Name  string        `json:"name"`
-	Roles []string      `json:"roles"`
-	Scope []string      `json:"scope,omitempty"`
+	Name  string         `json:"name"`
+	Roles []string       `json:"roles"`
+	Scope []string       `json:"scope,omitempty"`
 	Actor *IdentityActor `json:"actor,omitempty"`
 }
 

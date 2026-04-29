@@ -20,7 +20,7 @@ func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	registerGet(schedules, globals)
 	registerEntries(schedules, globals)
 	registerOverride(schedules, globals)
-	shared.RegisterLLMHelp(schedules, "LLM reference for schedules commands", schedulesLLMHelp)
+	shared.RegisterUsage(schedules, "schedule", usageText)
 
 	root.AddCommand(schedules)
 }

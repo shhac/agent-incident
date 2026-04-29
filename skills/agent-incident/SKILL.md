@@ -104,12 +104,12 @@ agent-incident status-page update update <sp-inc-id> --status resolved
 Per-command details (only load when the quick reference above isn't enough):
 
 ```bash
-agent-incident llm-help                        # full command overview
-agent-incident incident llm-help               # incident lifecycle, create/edit fields
-agent-incident alert llm-help                  # alert statuses, create alert events
-agent-incident oncall schedule llm-help        # schedule entries, overrides
-agent-incident oncall escalation llm-help      # escalation paths, create escalations
-agent-incident status-page llm-help            # status page update management
+agent-incident usage                           # full command overview
+agent-incident incident usage                  # incident lifecycle, create/edit fields
+agent-incident alert usage                     # alert statuses, create alert events
+agent-incident oncall schedule usage           # schedule entries, overrides
+agent-incident oncall escalation usage         # escalation paths, create escalations
+agent-incident status-page usage               # status page update management
 ```
 
 ## Discovery Commands

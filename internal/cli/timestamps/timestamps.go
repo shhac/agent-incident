@@ -17,7 +17,7 @@ func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 
 	registerList(ts, globals)
 	registerGet(ts, globals)
-	shared.RegisterLLMHelp(ts, "LLM reference for timestamps", llmHelpText)
+	shared.RegisterUsage(ts, "timestamp", usageText)
 
 	root.AddCommand(ts)
 }

@@ -27,7 +27,7 @@ func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	registerIncidentsUpdate(update, globals)
 	cmd.AddCommand(update)
 
-	shared.RegisterLLMHelp(cmd, "Status pages reference for LLMs", llmHelpText)
+	shared.RegisterUsage(cmd, "status-page", usageText)
 	root.AddCommand(cmd)
 }
 

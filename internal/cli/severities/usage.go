@@ -1,6 +1,6 @@
 package severities
 
-const llmHelpText = `agent-incident severities — Incident severity levels
+const usageText = `agent-incident severities — Incident severity levels
 
 COMMANDS
   agent-incident severities list          List all configured severities

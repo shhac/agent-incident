@@ -1,6 +1,6 @@
 package roles
 
-const llmHelpText = `agent-incident roles — Incident role definitions
+const usageText = `agent-incident roles — Incident role definitions
 
 COMMANDS
   agent-incident roles list          List all configured incident roles

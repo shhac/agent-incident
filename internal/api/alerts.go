@@ -103,11 +103,11 @@ func (c *Client) GetAlert(ctx context.Context, id string) (*Alert, error) {
 
 // CreateAlertEventParams holds the body for creating an alert event.
 type CreateAlertEventParams struct {
-	Title       string            `json:"title"`
-	Description string            `json:"description,omitempty"`
-	Status      string            `json:"status,omitempty"`
-	Metadata    map[string]string `json:"metadata,omitempty"`
-	DeduplicationKey string       `json:"deduplication_key,omitempty"`
+	Title            string            `json:"title"`
+	Description      string            `json:"description,omitempty"`
+	Status           string            `json:"status,omitempty"`
+	Metadata         map[string]string `json:"metadata,omitempty"`
+	DeduplicationKey string            `json:"deduplication_key,omitempty"`
 }
 
 type alertEventWrapper struct {

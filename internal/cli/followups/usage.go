@@ -1,6 +1,6 @@
 package followups
 
-const llmHelpText = `agent-incident follow-ups — Post-incident action items
+const usageText = `agent-incident follow-ups — Post-incident action items
 
 COMMANDS
   follow-ups list [--incident <id>] [--limit N] [--after <cursor>]

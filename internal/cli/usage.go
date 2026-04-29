@@ -6,9 +6,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func registerLLMHelpCommand(root *cobra.Command) {
+func registerUsageCommand(root *cobra.Command) {
 	root.AddCommand(&cobra.Command{
-		Use:   "llm-help",
+		Use:   "usage",
 		Short: "LLM-optimized reference card",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Print(usageText)
@@ -82,5 +82,5 @@ GLOBAL FLAGS
   --format json|yaml|jsonl (default: jsonl for lists, json for single items)
   --timeout <ms>
 
-Per-domain details: agent-incident <command> llm-help
+Per-domain details: agent-incident <command> usage
 `

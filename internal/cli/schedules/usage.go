@@ -1,6 +1,6 @@
 package schedules
 
-const schedulesLLMHelp = `# schedules domain — agent-incident CLI
+const usageText = `# schedules domain — agent-incident CLI
 
 ## Commands
 

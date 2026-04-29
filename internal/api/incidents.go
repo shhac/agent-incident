@@ -35,7 +35,7 @@ type IncidentUser struct {
 }
 
 type CustomFieldEntry struct {
-	CustomField *CustomFieldRef `json:"custom_field,omitempty"`
+	CustomField *CustomFieldRef    `json:"custom_field,omitempty"`
 	Values      []CustomFieldValue `json:"values,omitempty"`
 }
 
@@ -45,9 +45,9 @@ type CustomFieldRef struct {
 }
 
 type CustomFieldValue struct {
-	ValueLink     string `json:"value_link,omitempty"`
-	ValueText     string `json:"value_text,omitempty"`
-	ValueNumeric  string `json:"value_numeric,omitempty"`
+	ValueLink         string `json:"value_link,omitempty"`
+	ValueText         string `json:"value_text,omitempty"`
+	ValueNumeric      string `json:"value_numeric,omitempty"`
 	ValueCatalogEntry *struct {
 		ID   string `json:"id"`
 		Name string `json:"name"`
@@ -71,23 +71,23 @@ type IncidentType struct {
 }
 
 type Incident struct {
-	ID                     string                   `json:"id"`
-	Name                   string                   `json:"name"`
-	Reference              string                   `json:"reference"`
-	Status                 IncidentStatusRef           `json:"incident_status"`
-	Severity               *IncidentSeverity         `json:"severity,omitempty"`
-	Description            string                   `json:"description,omitempty"`
-	Summary                string                   `json:"summary,omitempty"`
-	CreatedAt              string                   `json:"created_at"`
-	UpdatedAt              string                   `json:"updated_at"`
+	ID                      string                   `json:"id"`
+	Name                    string                   `json:"name"`
+	Reference               string                   `json:"reference"`
+	Status                  IncidentStatusRef        `json:"incident_status"`
+	Severity                *IncidentSeverity        `json:"severity,omitempty"`
+	Description             string                   `json:"description,omitempty"`
+	Summary                 string                   `json:"summary,omitempty"`
+	CreatedAt               string                   `json:"created_at"`
+	UpdatedAt               string                   `json:"updated_at"`
 	IncidentRoleAssignments []IncidentRoleAssignment `json:"incident_role_assignments,omitempty"`
-	CustomFieldEntries     []CustomFieldEntry        `json:"custom_field_entries,omitempty"`
-	IncidentTimestamps     []IncidentTimestamp       `json:"incident_timestamps,omitempty"`
-	ExternalResources      []ExternalResource        `json:"external_resources,omitempty"`
-	IncidentType           *IncidentType             `json:"incident_type,omitempty"`
-	Mode                   string                   `json:"mode,omitempty"`
-	Visibility             string                   `json:"visibility,omitempty"`
-	Permalink              string                   `json:"permalink,omitempty"`
+	CustomFieldEntries      []CustomFieldEntry       `json:"custom_field_entries,omitempty"`
+	IncidentTimestamps      []IncidentTimestamp      `json:"incident_timestamps,omitempty"`
+	ExternalResources       []ExternalResource       `json:"external_resources,omitempty"`
+	IncidentType            *IncidentType            `json:"incident_type,omitempty"`
+	Mode                    string                   `json:"mode,omitempty"`
+	Visibility              string                   `json:"visibility,omitempty"`
+	Permalink               string                   `json:"permalink,omitempty"`
 }
 
 type IncidentCompact struct {
@@ -139,14 +139,13 @@ type ListIncidentsOpts struct {
 }
 
 type incidentsWrapper struct {
-	Incidents        []Incident `json:"incidents"`
-	PaginationMeta   *paginationMeta `json:"pagination_meta,omitempty"`
+	Incidents      []Incident      `json:"incidents"`
+	PaginationMeta *paginationMeta `json:"pagination_meta,omitempty"`
 }
 
 type incidentWrapper struct {
 	Incident Incident `json:"incident"`
 }
-
 
 func (c *Client) ListIncidents(ctx context.Context, opts ListIncidentsOpts) ([]Incident, string, error) {
 	params := url.Values{}
@@ -181,12 +180,12 @@ func (c *Client) GetIncident(ctx context.Context, id string) (*Incident, error) 
 
 // CreateIncidentParams are the parameters for creating an incident.
 type CreateIncidentParams struct {
-	Name       string            `json:"name"`
-	Summary    string            `json:"summary,omitempty"`
-	SeverityID string            `json:"severity_id,omitempty"`
-	Mode       string            `json:"mode,omitempty"`
-	Visibility string            `json:"visibility,omitempty"`
-	IdempotencyKey string        `json:"idempotency_key"`
+	Name           string `json:"name"`
+	Summary        string `json:"summary,omitempty"`
+	SeverityID     string `json:"severity_id,omitempty"`
+	Mode           string `json:"mode,omitempty"`
+	Visibility     string `json:"visibility,omitempty"`
+	IdempotencyKey string `json:"idempotency_key"`
 }
 
 func (c *Client) CreateIncident(ctx context.Context, params CreateIncidentParams) (*Incident, error) {
@@ -200,17 +199,17 @@ type EditIncidentParams struct {
 }
 
 type EditIncidentFields struct {
-	Name                   *string                      `json:"name,omitempty"`
-	Summary                *string                      `json:"summary,omitempty"`
-	SeverityID             *string                      `json:"severity_id,omitempty"`
-	IncidentStatusID       *string                      `json:"incident_status_id,omitempty"`
-	CustomFieldEntries     []EditCustomFieldEntry        `json:"custom_field_entries,omitempty"`
+	Name                    *string                      `json:"name,omitempty"`
+	Summary                 *string                      `json:"summary,omitempty"`
+	SeverityID              *string                      `json:"severity_id,omitempty"`
+	IncidentStatusID        *string                      `json:"incident_status_id,omitempty"`
+	CustomFieldEntries      []EditCustomFieldEntry       `json:"custom_field_entries,omitempty"`
 	IncidentTimestampValues []EditIncidentTimestampValue `json:"incident_timestamp_values,omitempty"`
 }
 
 type EditCustomFieldEntry struct {
-	CustomFieldID string                  `json:"custom_field_id"`
-	Values        []EditCustomFieldValue  `json:"values"`
+	CustomFieldID string                 `json:"custom_field_id"`
+	Values        []EditCustomFieldValue `json:"values"`
 }
 
 type EditCustomFieldValue struct {
@@ -234,12 +233,12 @@ func (c *Client) EditIncident(ctx context.Context, id string, params EditInciden
 
 // IncidentUpdate represents an update posted to an incident.
 type IncidentUpdate struct {
-	ID         string `json:"id"`
-	IncidentID string `json:"incident_id"`
-	Message    string `json:"message,omitempty"`
+	ID         string             `json:"id"`
+	IncidentID string             `json:"incident_id"`
+	Message    string             `json:"message,omitempty"`
 	NewStatus  *IncidentStatusRef `json:"new_incident_status,omitempty"`
-	CreatedAt  string `json:"created_at"`
-	Updater    *IncidentUser `json:"updater,omitempty"`
+	CreatedAt  string             `json:"created_at"`
+	Updater    *IncidentUser      `json:"updater,omitempty"`
 }
 
 type incidentUpdatesWrapper struct {

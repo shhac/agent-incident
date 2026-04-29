@@ -16,12 +16,12 @@ type CatalogType struct {
 }
 
 type CatalogEntry struct {
-	ID            string                    `json:"id"`
-	Name          string                    `json:"name"`
-	CatalogTypeID string                   `json:"catalog_type_id"`
+	ID              string                    `json:"id"`
+	Name            string                    `json:"name"`
+	CatalogTypeID   string                    `json:"catalog_type_id"`
 	AttributeValues map[string]CatalogAttrVal `json:"attribute_values,omitempty"`
-	CreatedAt     string                    `json:"created_at"`
-	UpdatedAt     string                    `json:"updated_at"`
+	CreatedAt       string                    `json:"created_at"`
+	UpdatedAt       string                    `json:"updated_at"`
 }
 
 type CatalogAttrVal struct {

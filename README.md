@@ -6,7 +6,7 @@ incident.io triage CLI for AI agents. Incidents, alerts, schedules, escalations 
 - **Structured error classification** — every error includes `fixable_by: agent|human|retry` so AI agents can self-correct without parsing messages
 - **Triage-focused** — only the commands you need during an investigation, not the 165+ incident.io API endpoints
 - **Multi-org support** — switch between incident.io organizations with `--organization`, credentials stored in macOS Keychain
-- **Self-documenting** — `agent-incident llm-help` and per-command `agent-incident <command> llm-help` for agent-friendly reference
+- **Self-documenting** — `agent-incident usage` and per-command `agent-incident <command> usage` for agent-friendly reference
 
 ### Why not the incident.io API directly?
 
@@ -95,7 +95,7 @@ agent-incident
 │   └── catalog
 │       ├── types         list, get
 │       └── entries       list, get
-├── llm-help              top-level reference card
+├── usage                 top-level reference card
 └── version
 ```
 

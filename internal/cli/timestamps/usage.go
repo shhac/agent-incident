@@ -1,6 +1,6 @@
 package timestamps
 
-const llmHelpText = `agent-incident timestamps — Incident timestamp definitions
+const usageText = `agent-incident timestamps — Incident timestamp definitions
 
 COMMANDS
   agent-incident timestamp list          List all timestamp definitions

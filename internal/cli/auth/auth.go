@@ -109,8 +109,8 @@ func registerDefault(parent *cobra.Command) {
 				return nil
 			}
 			shared.WriteItem(map[string]any{
-				"status":  "default_set",
-				"alias":   alias,
+				"status": "default_set",
+				"alias":  alias,
 			}, "")
 			return nil
 		},

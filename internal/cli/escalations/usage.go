@@ -1,6 +1,6 @@
 package escalations
 
-const escalationsLLMHelp = `# escalations domain — agent-incident CLI
+const usageText = `# escalations domain — agent-incident CLI
 
 ## Commands
 

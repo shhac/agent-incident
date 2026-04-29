@@ -1,6 +1,6 @@
 package incidents
 
-const incidentsLLMHelp = `# incidents domain — agent-incident CLI
+const usageText = `# incidents domain — agent-incident CLI
 
 ## Commands
 

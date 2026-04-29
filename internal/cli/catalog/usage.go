@@ -1,6 +1,6 @@
 package catalog
 
-const llmHelpText = `agent-incident catalog — Service catalog queries
+const usageText = `agent-incident catalog — Service catalog queries
 
 COMMANDS
   catalog types list

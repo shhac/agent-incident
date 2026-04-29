@@ -7,15 +7,15 @@ import (
 )
 
 type CustomField struct {
-	ID             string              `json:"id"`
-	Name           string              `json:"name"`
-	Description    string              `json:"description,omitempty"`
-	FieldType      string              `json:"field_type"`
-	Required       string              `json:"required,omitempty"`
-	CatalogTypeID  string              `json:"catalog_type_id,omitempty"`
-	Options        []CustomFieldOption `json:"options,omitempty"`
-	CreatedAt      string              `json:"created_at"`
-	UpdatedAt      string              `json:"updated_at"`
+	ID            string              `json:"id"`
+	Name          string              `json:"name"`
+	Description   string              `json:"description,omitempty"`
+	FieldType     string              `json:"field_type"`
+	Required      string              `json:"required,omitempty"`
+	CatalogTypeID string              `json:"catalog_type_id,omitempty"`
+	Options       []CustomFieldOption `json:"options,omitempty"`
+	CreatedAt     string              `json:"created_at"`
+	UpdatedAt     string              `json:"updated_at"`
 }
 
 type CustomFieldOption struct {
@@ -46,7 +46,7 @@ func (c *Client) GetCustomField(ctx context.Context, id string) (*CustomField, e
 
 type customFieldOptionsWrapper struct {
 	CustomFieldOptions []CustomFieldOption `json:"custom_field_options"`
-	PaginationMeta     *paginationMeta    `json:"pagination_meta,omitempty"`
+	PaginationMeta     *paginationMeta     `json:"pagination_meta,omitempty"`
 }
 
 func (c *Client) ListCustomFieldOptions(ctx context.Context, customFieldID string, pageSize int, after string) ([]CustomFieldOption, string, error) {

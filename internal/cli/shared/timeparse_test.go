@@ -182,7 +182,7 @@ func TestParseDateFlag(t *testing.T) {
 	}{
 		{"", ""},
 		{"2024-06-15T10:30:00Z", "2024-06-15"},
-		{"now-1d", ""},  // relative — just check no error
+		{"now-1d", ""}, // relative — just check no error
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

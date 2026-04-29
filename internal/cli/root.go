@@ -57,7 +57,7 @@ func newRootCmd(version string) *cobra.Command {
 	root.PersistentFlags().IntVar(&flagTimeout, "timeout", 0, "Request timeout in milliseconds")
 	root.PersistentFlags().BoolVar(&flagDebug, "debug", false, "Log HTTP requests and responses to stderr")
 
-	registerLLMHelpCommand(root)
+	registerUsageCommand(root)
 	auth.Register(root)
 
 	// Core triage

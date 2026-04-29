@@ -48,7 +48,7 @@ func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	registerCreate(incidents, globals)
 	registerEdit(incidents, globals)
 	registerUpdates(incidents, globals)
-	shared.RegisterLLMHelp(incidents, "LLM reference for incidents commands", incidentsLLMHelp)
+	shared.RegisterUsage(incidents, "incident", usageText)
 
 	root.AddCommand(incidents)
 }
@@ -57,8 +57,8 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 	var (
 		status   []string
 		severity []string
-		from  string
-		to    string
+		from     string
+		to       string
 		limit    int
 		after    string
 		full     bool
@@ -289,4 +289,3 @@ func registerUpdates(parent *cobra.Command, globals shared.GlobalsFunc) {
 	cmd.Flags().StringVar(&after, "after", "", "Pagination cursor")
 	parent.AddCommand(cmd)
 }
-

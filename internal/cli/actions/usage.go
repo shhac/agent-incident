@@ -1,6 +1,6 @@
 package actions
 
-const llmHelpText = `agent-incident actions — In-incident tasks
+const usageText = `agent-incident actions — In-incident tasks
 
 COMMANDS
   actions list [--incident <id>] [--limit N] [--after <cursor>]

@@ -1,6 +1,6 @@
 package alerts
 
-const alertsLLMHelp = `# alerts — Manage incident.io alerts
+const usageText = `# alerts — Manage incident.io alerts
 
 ## Commands
 

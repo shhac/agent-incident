@@ -152,7 +152,7 @@ func TestToCompactFromFixture(t *testing.T) {
 	data := testdata.Load("incidents_list.json")
 
 	var wrapper struct {
-		Incidents      []Incident `json:"incidents"`
+		Incidents      []Incident      `json:"incidents"`
 		PaginationMeta json.RawMessage `json:"pagination_meta"`
 	}
 	if err := json.Unmarshal(data, &wrapper); err != nil {

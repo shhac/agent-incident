@@ -1,6 +1,6 @@
 package statuses
 
-const llmHelpText = `agent-incident statuses — Incident status lifecycle states
+const usageText = `agent-incident statuses — Incident status lifecycle states
 
 COMMANDS
   agent-incident statuses list          List all configured incident statuses

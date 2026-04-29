@@ -21,7 +21,7 @@ func Register(root *cobra.Command, globals shared.GlobalsFunc) {
 	registerGet(alerts, globals)
 	registerCreate(alerts, globals)
 	registerIncidents(alerts, globals)
-	shared.RegisterLLMHelp(alerts, "LLM reference for alerts commands", alertsLLMHelp)
+	shared.RegisterUsage(alerts, "alert", usageText)
 
 	root.AddCommand(alerts)
 }
@@ -30,8 +30,8 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 	var (
 		status string
 		source string
-		from  string
-		to    string
+		from   string
+		to     string
 		limit  int
 		after  string
 		full   bool
