@@ -51,11 +51,11 @@ func newRootCmd(version string) *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	root.PersistentFlags().StringVar(&flagOrg, "organization", "", "Organization alias (or set INCIDENT_API_KEY)")
+	root.PersistentFlags().StringVarP(&flagOrg, "org", "o", "", "Organization alias (or set INCIDENT_API_KEY)")
 	root.PersistentFlags().StringVar(&flagAPIKey, "api-key", "", "API key (overrides stored credentials)")
-	root.PersistentFlags().StringVar(&flagFormat, "format", "", "Output format: json, yaml, jsonl")
-	root.PersistentFlags().IntVar(&flagTimeout, "timeout", 0, "Request timeout in milliseconds")
-	root.PersistentFlags().BoolVar(&flagDebug, "debug", false, "Log HTTP requests and responses to stderr")
+	root.PersistentFlags().StringVarP(&flagFormat, "format", "f", "", "Output format: json, yaml, jsonl")
+	root.PersistentFlags().IntVarP(&flagTimeout, "timeout", "t", 0, "Request timeout in milliseconds")
+	root.PersistentFlags().BoolVarP(&flagDebug, "debug", "d", false, "Log HTTP requests and responses to stderr")
 
 	registerUsageCommand(root)
 	auth.Register(root)

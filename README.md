@@ -5,7 +5,7 @@ incident.io triage CLI for AI agents. Incidents, alerts, schedules, escalations 
 - **Token-efficient output** — NDJSON for lists, JSON for single items, YAML available. Compact and null-pruned by default. `--full` for complete API responses
 - **Structured error classification** — every error includes `fixable_by: agent|human|retry` so AI agents can self-correct without parsing messages
 - **Triage-focused** — only the commands you need during an investigation, not the 165+ incident.io API endpoints
-- **Multi-org support** — switch between incident.io organizations with `--organization`, credentials stored in macOS Keychain
+- **Multi-org support** — switch between incident.io organizations with `--org`, credentials stored in macOS Keychain
 - **Self-documenting** — `agent-incident usage` and per-command `agent-incident <command> usage` for agent-friendly reference
 
 ### Why not the incident.io API directly?
@@ -129,7 +129,7 @@ agent-incident auth add prod --api-key <key>
 agent-incident auth add staging --api-key <key>
 
 # Query a specific org
-agent-incident incident list --status active --organization staging
+agent-incident incident list --status active --org staging
 
 # Set a default
 agent-incident auth default prod

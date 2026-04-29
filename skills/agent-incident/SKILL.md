@@ -142,4 +142,4 @@ Keys are managed at `https://app.incident.io/~/settings/api-keys`.
 
 Environment variable also works: `INCIDENT_API_KEY=<key>`.
 
-Multiple orgs: `agent-incident auth add prod --api-key <key>`, then `--organization prod` on any command.
+Multiple orgs: `agent-incident auth add prod --api-key <key>`, then `--org prod` on any command.
