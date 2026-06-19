@@ -63,11 +63,6 @@ func Print(data any, format Format, prune bool) {
 	_ = out.Print(os.Stdout, data, format, pruner(prune))
 }
 
-// PrintJSON encodes data as pretty JSON, optionally pruning nil fields.
-func PrintJSON(data any, prune bool) {
-	Print(data, FormatJSON, prune)
-}
-
 func pruner(prune bool) out.Pruner {
 	if prune {
 		return out.PruneNils

@@ -18,11 +18,6 @@ func looksLikeID(s string) bool {
 	return ulidPattern.MatchString(s)
 }
 
-// LooksLikeID is the exported version for use by other packages.
-func LooksLikeID(s string) bool {
-	return looksLikeID(s)
-}
-
 func ambiguousError(kind string, query string, names []string) error {
 	return agenterrors.Newf(agenterrors.FixableByAgent,
 		"ambiguous %s %q matched %d results", kind, query, len(names)).
