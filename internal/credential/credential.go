@@ -7,9 +7,17 @@ import (
 	"path/filepath"
 
 	"github.com/shhac/agent-incident/internal/config"
+	"github.com/shhac/lib-agent-cli/creds"
 )
 
 const keychainSentinel = "__KEYCHAIN__"
+
+// keychainService is the reverse-domain service name under which this CLI's
+// credentials live in the macOS keychain. The library is service-agnostic; the
+// CLI owns this identifier.
+const keychainService = "app.paulie.agent-incident"
+
+var keychain = creds.NewKeychain(keychainService)
 
 type Credential struct {
 	APIKey          string `json:"api_key"`
@@ -74,7 +82,7 @@ func Store(name string, cred Credential) (string, error) {
 		APIKey: cred.APIKey,
 	}
 
-	if err := keychainStore(name, cred.APIKey); err == nil {
+	if err := keychain.Set(name, cred.APIKey); err == nil {
 		entry.APIKey = keychainSentinel
 		entry.KeychainManaged = true
 		storage = "keychain"
@@ -103,7 +111,7 @@ func Get(name string) (*Credential, error) {
 	}
 
 	if entry.KeychainManaged {
-		if apiKey, err := keychainGet(name); err == nil {
+		if apiKey, ok := keychain.Get(name); ok {
 			cred.APIKey = apiKey
 		}
 	}
@@ -122,7 +130,7 @@ func Remove(name string) error {
 	}
 
 	if entry.KeychainManaged {
-		keychainDelete(name)
+		_ = keychain.Delete(name)
 	}
 
 	delete(index, name)
