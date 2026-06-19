@@ -31,10 +31,6 @@ func TestParseFormat(t *testing.T) {
 				if err == nil {
 					t.Fatalf("expected error for input %q", tt.input)
 				}
-				var apiErr *agenterrors.APIError
-				if !agenterrors.As(err, &apiErr) {
-					t.Fatal("expected APIError")
-				}
 				return
 			}
 			if err != nil {

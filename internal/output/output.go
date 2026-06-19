@@ -1,130 +1,100 @@
+// Package output re-exports the shared output contract from lib-agent-output,
+// keeping the internal/output import path while the wire mechanism (format
+// parsing, JSON/YAML encoding, error rendering) lives in one place. What stays
+// local is agent-incident policy: the single-return ResolveFormat the commands
+// call, the Print(data, format, prune bool) signature, and the incident.io-shaped
+// pagination trailer. (Migration shim.)
 package output
 
 import (
-	"encoding/json"
+	"bytes"
 	"io"
 	"os"
 
-	agenterrors "github.com/shhac/agent-incident/internal/errors"
+	out "github.com/shhac/lib-agent-output"
 	"gopkg.in/yaml.v3"
 )
 
-type Format string
+// Format and its values come from the shared contract; ParseFormat is therefore
+// the family's lenient parser (accepts "ndjson"/"yml", case-insensitive).
+type Format = out.Format
 
 const (
-	FormatJSON   Format = "json"
-	FormatYAML   Format = "yaml"
-	FormatNDJSON Format = "jsonl"
+	FormatJSON   = out.FormatJSON
+	FormatYAML   = out.FormatYAML
+	FormatNDJSON = out.FormatNDJSON
 )
 
-func ParseFormat(s string) (Format, error) {
-	switch s {
-	case "json":
-		return FormatJSON, nil
-	case "yaml":
-		return FormatYAML, nil
-	case "jsonl", "ndjson":
-		return FormatNDJSON, nil
-	default:
-		return "", agenterrors.Newf(agenterrors.FixableByAgent, "unknown format %q, expected: json, yaml, jsonl", s)
-	}
+var (
+	ParseFormat = out.ParseFormat
+	WriteError  = out.WriteError
+)
+
+// init registers agent-incident's YAML encoder with lib-agent-output, so YAML
+// support (and its yaml.v3 dependency) stays in this CLI while the core library
+// remains dependency-free.
+func init() {
+	out.RegisterEncoder(out.FormatYAML, func(v any) ([]byte, error) {
+		var buf bytes.Buffer
+		enc := yaml.NewEncoder(&buf)
+		enc.SetIndent(2)
+		if err := enc.Encode(v); err != nil {
+			return nil, err
+		}
+		_ = enc.Close()
+		return buf.Bytes(), nil
+	})
 }
 
+// ResolveFormat keeps agent-incident's single-return signature (the commands
+// call it without error handling): a bad flag falls back to the default rather
+// than surfacing a parse error.
 func ResolveFormat(flagFormat string, defaultFormat Format) Format {
-	if flagFormat == "" {
-		return defaultFormat
-	}
-	f, err := ParseFormat(flagFormat)
+	f, err := out.ResolveFormat(flagFormat, defaultFormat)
 	if err != nil {
 		return defaultFormat
 	}
 	return f
 }
 
+// Print encodes data in the given format via the shared encoder, optionally
+// pruning nil fields first.
 func Print(data any, format Format, prune bool) {
-	switch format {
-	case FormatYAML:
-		printYAML(data, prune)
-	default:
-		printJSON(data, prune)
-	}
+	_ = out.Print(os.Stdout, data, format, pruner(prune))
 }
 
+// PrintJSON encodes data as pretty JSON, optionally pruning nil fields.
 func PrintJSON(data any, prune bool) {
-	printJSON(data, prune)
+	Print(data, FormatJSON, prune)
 }
 
-// toCleanAny round-trips data through JSON to get a generic any value,
-// optionally pruning null fields.
-func toCleanAny(data any, prune bool) (any, bool) {
-	b, err := json.Marshal(data)
-	if err != nil {
-		return nil, false
-	}
-	var decoded any
-	if err := json.Unmarshal(b, &decoded); err != nil {
-		return nil, false
-	}
+func pruner(prune bool) out.Pruner {
 	if prune {
-		decoded = pruneNulls(decoded)
+		return out.PruneNils
 	}
-	return decoded, true
+	return nil
 }
 
-func printJSON(data any, prune bool) {
-	cleaned, ok := toCleanAny(data, prune)
-	if !ok {
-		return
-	}
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "  ")
-	enc.SetEscapeHTML(false)
-	_ = enc.Encode(cleaned)
-}
-
-func printYAML(data any, prune bool) {
-	cleaned, ok := toCleanAny(data, prune)
-	if !ok {
-		return
-	}
-	enc := yaml.NewEncoder(os.Stdout)
-	enc.SetIndent(2)
-	_ = enc.Encode(cleaned)
-}
-
-func WriteError(w io.Writer, err error) {
-	var aerr *agenterrors.APIError
-	if !agenterrors.As(err, &aerr) {
-		aerr = agenterrors.Wrap(err, agenterrors.FixableByAgent)
-	}
-	payload := map[string]any{
-		"error":      aerr.Message,
-		"fixable_by": string(aerr.FixableBy),
-	}
-	if aerr.Hint != "" {
-		payload["hint"] = aerr.Hint
-	}
-	enc := json.NewEncoder(w)
-	enc.SetEscapeHTML(false)
-	_ = enc.Encode(payload)
-}
+// pruneNulls drops nil map values recursively. Retained as the local name the
+// package's tests pin; it delegates to the shared PruneNils policy.
+func pruneNulls(v any) any { return out.PruneNils(v) }
 
 // NDJSONWriter writes one JSON object per line.
 type NDJSONWriter struct {
-	enc *json.Encoder
+	w *out.NDJSONWriter
 }
 
 func NewNDJSONWriter(w io.Writer) *NDJSONWriter {
-	enc := json.NewEncoder(w)
-	enc.SetEscapeHTML(false)
-	return &NDJSONWriter{enc: enc}
+	return &NDJSONWriter{w: out.NewNDJSONWriter(w)}
 }
 
 func (n *NDJSONWriter) WriteItem(item any) error {
-	return n.enc.Encode(item)
+	return n.w.WriteItem(item)
 }
 
-// Pagination metadata for cursor-based APIs.
+// Pagination metadata for cursor-based APIs. incident.io exposes a next cursor
+// and total count, so it stays local rather than using out.Pagination's value
+// receiver — the commands hold a *Pagination.
 type Pagination struct {
 	HasMore    bool   `json:"has_more"`
 	TotalItems int    `json:"total_items,omitempty"`
@@ -132,27 +102,5 @@ type Pagination struct {
 }
 
 func (n *NDJSONWriter) WritePagination(p *Pagination) error {
-	return n.enc.Encode(map[string]any{"@pagination": p})
-}
-
-func pruneNulls(v any) any {
-	switch val := v.(type) {
-	case map[string]any:
-		out := make(map[string]any, len(val))
-		for k, v := range val {
-			if v == nil {
-				continue
-			}
-			out[k] = pruneNulls(v)
-		}
-		return out
-	case []any:
-		out := make([]any, len(val))
-		for i, v := range val {
-			out[i] = pruneNulls(v)
-		}
-		return out
-	default:
-		return v
-	}
+	return n.w.WriteMetaLine(out.MetaKeyPagination, p)
 }
