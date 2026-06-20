@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -22,6 +21,7 @@ import (
 	"github.com/shhac/agent-incident/internal/cli/statuspages"
 	"github.com/shhac/agent-incident/internal/cli/timestamps"
 	"github.com/shhac/agent-incident/internal/cli/users"
+	"github.com/shhac/agent-incident/internal/output"
 )
 
 var (
@@ -98,7 +98,7 @@ func newRootCmd(version string) *cobra.Command {
 func Execute(version string) error {
 	err := newRootCmd(version).Execute()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		output.WriteError(os.Stderr, err)
 	}
 	return err
 }

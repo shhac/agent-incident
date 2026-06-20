@@ -12,7 +12,6 @@ import (
 	"github.com/shhac/agent-incident/internal/config"
 	"github.com/shhac/agent-incident/internal/credential"
 	agenterrors "github.com/shhac/agent-incident/internal/errors"
-	"github.com/shhac/agent-incident/internal/output"
 )
 
 func MakeContext(timeoutMs int) (context.Context, context.CancelFunc) {
@@ -91,7 +90,9 @@ func NewClientFromFlags(apiKeyFlag, orgAlias string) (*api.Client, error) {
 // ClientFactory allows DI for testing. When set, WithClient uses this instead of real credential resolution.
 var ClientFactory func() (*api.Client, error)
 
-// WithClient resolves an API client and runs the callback. Errors are written to stderr.
+// WithClient resolves an API client and runs the callback. Errors are returned
+// for the root Execute sink to render once as a structured stderr line; callers
+// must not render them again.
 func WithClient(g *GlobalFlags, fn func(ctx context.Context, client *api.Client) error) error {
 	ctx, cancel := MakeContext(g.Timeout)
 	defer cancel()
@@ -104,15 +105,10 @@ func WithClient(g *GlobalFlags, fn func(ctx context.Context, client *api.Client)
 		client, err = NewClientFromFlags(g.APIKey, g.Org)
 	}
 	if err != nil {
-		output.WriteError(os.Stderr, err)
 		return err
 	}
 
 	client.SetDebug(g.Debug)
 
-	if err := fn(ctx, client); err != nil {
-		output.WriteError(os.Stderr, err)
-		return err
-	}
-	return nil
+	return fn(ctx, client)
 }

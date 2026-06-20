@@ -8,7 +8,24 @@ import (
 	"testing"
 
 	agenterrors "github.com/shhac/agent-incident/internal/errors"
+	out "github.com/shhac/lib-agent-output"
 )
+
+// TestYAMLEncoderRegistered guards the package init: --format yaml must produce
+// real YAML, not silently fall back to JSON because no encoder was registered.
+func TestYAMLEncoderRegistered(t *testing.T) {
+	var buf bytes.Buffer
+	if err := out.Print(&buf, map[string]any{"alias": "ldt", "default": true}, FormatYAML, nil); err != nil {
+		t.Fatalf("Print yaml: %v", err)
+	}
+	got := buf.String()
+	if !strings.Contains(got, "alias: ldt") {
+		t.Fatalf("expected YAML output, got: %q", got)
+	}
+	if strings.Contains(got, "{") {
+		t.Fatalf("YAML output unexpectedly contains JSON braces: %q", got)
+	}
+}
 
 func TestParseFormat(t *testing.T) {
 	tests := []struct {
