@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
 
 	"github.com/shhac/agent-incident/internal/cli/actions"
@@ -22,40 +20,25 @@ import (
 	"github.com/shhac/agent-incident/internal/cli/timestamps"
 	"github.com/shhac/agent-incident/internal/cli/users"
 	"github.com/shhac/agent-incident/internal/output"
+	libcli "github.com/shhac/lib-agent-cli/cli"
 )
-
-var (
-	flagOrg     string
-	flagAPIKey  string
-	flagFormat  string
-	flagTimeout int
-	flagDebug   bool
-)
-
-func allGlobals() *shared.GlobalFlags {
-	return &shared.GlobalFlags{
-		Org:     flagOrg,
-		APIKey:  flagAPIKey,
-		Format:  flagFormat,
-		Timeout: flagTimeout,
-		Debug:   flagDebug,
-	}
-}
 
 func newRootCmd(version string) *cobra.Command {
-	root := &cobra.Command{
+	g := &shared.GlobalFlags{}
+	allGlobals := func() *shared.GlobalFlags { return g }
+
+	root := libcli.NewRoot(libcli.Options{
 		Use:           "agent-incident",
 		Short:         "incident.io triage CLI for AI agents",
 		Version:       version,
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
+		Globals:       &g.Globals,
+		DefaultFormat: output.FormatNDJSON,
+		UnknownHint:   "run 'agent-incident usage' to see the available commands",
+	})
 
-	root.PersistentFlags().StringVarP(&flagOrg, "org", "o", "", "Organization alias (or set INCIDENT_API_KEY)")
-	root.PersistentFlags().StringVar(&flagAPIKey, "api-key", "", "API key (overrides stored credentials)")
-	root.PersistentFlags().StringVarP(&flagFormat, "format", "f", "", "Output format: json, yaml, jsonl")
-	root.PersistentFlags().IntVarP(&flagTimeout, "timeout", "t", 0, "Request timeout in milliseconds")
-	root.PersistentFlags().BoolVarP(&flagDebug, "debug", "d", false, "Log HTTP requests and responses to stderr")
+	pf := root.PersistentFlags()
+	pf.StringVarP(&g.Org, "org", "o", "", "Organization alias (or set INCIDENT_API_KEY)")
+	pf.StringVar(&g.APIKey, "api-key", "", "API key (overrides stored credentials)")
 
 	registerUsageCommand(root)
 	auth.Register(root)
@@ -95,10 +78,8 @@ func newRootCmd(version string) *cobra.Command {
 	return root
 }
 
-func Execute(version string) error {
-	err := newRootCmd(version).Execute()
-	if err != nil {
-		output.WriteError(os.Stderr, err)
-	}
-	return err
+// Run builds the root command and runs it, rendering any error as the family's
+// structured stderr line and exiting non-zero on failure.
+func Run(version string) {
+	libcli.Run(newRootCmd(version))
 }

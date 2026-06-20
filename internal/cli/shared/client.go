@@ -94,7 +94,7 @@ var ClientFactory func() (*api.Client, error)
 // for the root Execute sink to render once as a structured stderr line; callers
 // must not render them again.
 func WithClient(g *GlobalFlags, fn func(ctx context.Context, client *api.Client) error) error {
-	ctx, cancel := MakeContext(g.Timeout)
+	ctx, cancel := MakeContext(g.TimeoutMS)
 	defer cancel()
 
 	var client *api.Client

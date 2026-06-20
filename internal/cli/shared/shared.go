@@ -5,15 +5,17 @@ import (
 
 	agenterrors "github.com/shhac/agent-incident/internal/errors"
 	"github.com/shhac/agent-incident/internal/output"
+	libcli "github.com/shhac/lib-agent-cli/cli"
 )
 
-// GlobalFlags holds persistent flags available to all commands.
+// GlobalFlags holds persistent flags available to all commands. The shared
+// --format/--timeout/--debug live in the embedded libcli.Globals; --org and
+// --api-key are incident.io domain flags.
 type GlobalFlags struct {
-	Org     string
-	APIKey  string
-	Format  string
-	Timeout int
-	Debug   bool
+	libcli.Globals // Format, TimeoutMS, Debug
+
+	Org    string
+	APIKey string
 }
 
 // GlobalsFunc is the signature for the globals accessor passed to domain Register functions.
