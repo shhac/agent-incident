@@ -149,8 +149,8 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Use:   "create",
 		Short: "Create a new incident",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !shared.RequireFlag("name", name, "Provide --name for the incident") {
-				return nil
+			if err := shared.RequireFlag("name", name, "Provide --name for the incident"); err != nil {
+				return err
 			}
 			g := globals()
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {

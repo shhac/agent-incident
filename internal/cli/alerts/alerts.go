@@ -129,11 +129,11 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Use:   "create",
 		Short: "Create an alert event via an HTTP alert source",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !shared.RequireFlag("source-id", sourceID, "Provide --source-id <alert_source_config_id>") {
-				return nil
+			if err := shared.RequireFlag("source-id", sourceID, "Provide --source-id <alert_source_config_id>"); err != nil {
+				return err
 			}
-			if !shared.RequireFlag("title", title, "Provide --title <alert title>") {
-				return nil
+			if err := shared.RequireFlag("title", title, "Provide --title <alert title>"); err != nil {
+				return err
 			}
 
 			g := globals()

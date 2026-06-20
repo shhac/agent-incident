@@ -88,10 +88,11 @@ func registerIncidentsCreate(parent *cobra.Command, globals shared.GlobalsFunc) 
 		Short: "Create a status page incident",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g := globals()
-			pageOk := shared.RequireFlag("page", pageRef, "")
-			nameOk := shared.RequireFlag("name", name, "")
-			if !pageOk || !nameOk {
-				return nil
+			if err := shared.RequireFlag("page", pageRef, ""); err != nil {
+				return err
+			}
+			if err := shared.RequireFlag("name", name, ""); err != nil {
+				return err
 			}
 			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
 				pageID, err := shared.ResolveStatusPageID(ctx, client, pageRef)

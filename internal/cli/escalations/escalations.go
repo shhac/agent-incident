@@ -74,11 +74,11 @@ func registerCreate(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Use:   "create",
 		Short: "Create a new escalation",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !shared.RequireFlag("incident", incidentID, "Provide --incident with the incident ID") {
-				return nil
+			if err := shared.RequireFlag("incident", incidentID, "Provide --incident with the incident ID"); err != nil {
+				return err
 			}
-			if !shared.RequireFlag("path", pathID, "Provide --path with the escalation path ID") {
-				return nil
+			if err := shared.RequireFlag("path", pathID, "Provide --path with the escalation path ID"); err != nil {
+				return err
 			}
 
 			g := globals()

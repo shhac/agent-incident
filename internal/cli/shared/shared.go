@@ -63,15 +63,16 @@ func CursorPagination(cursor string) *output.Pagination {
 	return &output.Pagination{HasMore: true, NextCursor: cursor}
 }
 
-// RequireFlag checks that a flag value is non-empty, writing an error to stderr if not.
-func RequireFlag(flag, value, hint string) bool {
+// RequireFlag returns a structured fixable_by:agent error when a flag value is
+// empty, and nil otherwise. Callers return the error so the root Run sink
+// renders it once and exits non-zero — they must not render it themselves.
+func RequireFlag(flag, value, hint string) error {
 	if value != "" {
-		return true
+		return nil
 	}
 	err := agenterrors.Newf(agenterrors.FixableByAgent, "--%s is required", flag)
 	if hint != "" {
 		err = err.WithHint(hint)
 	}
-	output.WriteError(os.Stderr, err)
-	return false
+	return err
 }

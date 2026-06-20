@@ -75,7 +75,27 @@ func newRootCmd(version string) *cobra.Command {
 	catalog.Register(ref, allGlobals)
 	root.AddCommand(ref)
 
+	installGroupUnknownHandlers(root)
+
 	return root
+}
+
+// installGroupUnknownHandlers walks the assembled tree and installs the
+// structured unknown-subcommand handler on every group command (one that owns
+// subcommands but has no Run of its own), so `agent-incident <group> bogus`
+// returns a fixable_by:agent error and exits non-zero instead of cobra's usage
+// text. The root already has its handler from libcli.NewRoot, so it is skipped.
+func installGroupUnknownHandlers(root *cobra.Command) {
+	var walk func(cmd *cobra.Command)
+	walk = func(cmd *cobra.Command) {
+		for _, sub := range cmd.Commands() {
+			if sub.HasSubCommands() && sub.Run == nil && sub.RunE == nil {
+				libcli.HandleUnknownCommand(sub, "run 'agent-incident usage' to see the available commands")
+			}
+			walk(sub)
+		}
+	}
+	walk(root)
 }
 
 // Run builds the root command and runs it, rendering any error as the family's

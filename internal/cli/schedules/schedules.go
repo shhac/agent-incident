@@ -117,14 +117,14 @@ func registerOverride(parent *cobra.Command, globals shared.GlobalsFunc) {
 		Short: "Create a schedule override",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !shared.RequireFlag("user", userID, "Provide --user with the user name, email, or ID for the override") {
-				return nil
+			if err := shared.RequireFlag("user", userID, "Provide --user with the user name, email, or ID for the override"); err != nil {
+				return err
 			}
-			if !shared.RequireFlag("from", from, "Provide --from for the override start time") {
-				return nil
+			if err := shared.RequireFlag("from", from, "Provide --from for the override start time"); err != nil {
+				return err
 			}
-			if !shared.RequireFlag("to", to, "Provide --to for the override end time") {
-				return nil
+			if err := shared.RequireFlag("to", to, "Provide --to for the override end time"); err != nil {
+				return err
 			}
 
 			fromTime, err := shared.ParseTime(from)

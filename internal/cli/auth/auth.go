@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"os"
 
 	"github.com/spf13/cobra"
 
@@ -10,7 +9,6 @@ import (
 	"github.com/shhac/agent-incident/internal/cli/shared"
 	"github.com/shhac/agent-incident/internal/config"
 	"github.com/shhac/agent-incident/internal/credential"
-	"github.com/shhac/agent-incident/internal/output"
 )
 
 // Register adds the auth command group to the root command.
@@ -38,19 +36,17 @@ func registerAdd(parent *cobra.Command) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			alias := args[0]
-			if !shared.RequireFlag("api-key", apiKey, "Provide --api-key <key>") {
-				return nil
+			if err := shared.RequireFlag("api-key", apiKey, "Provide --api-key <key>"); err != nil {
+				return err
 			}
 
 			storage, err := credential.Store(alias, credential.Credential{APIKey: apiKey})
 			if err != nil {
-				output.WriteError(os.Stderr, err)
-				return nil
+				return err
 			}
 
 			if err := config.StoreOrganization(alias); err != nil {
-				output.WriteError(os.Stderr, err)
-				return nil
+				return err
 			}
 
 			shared.WriteItem(map[string]any{
@@ -105,8 +101,7 @@ func registerDefault(parent *cobra.Command) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			alias := args[0]
 			if err := config.SetDefault(alias); err != nil {
-				output.WriteError(os.Stderr, err)
-				return nil
+				return err
 			}
 			shared.WriteItem(map[string]any{
 				"status": "default_set",
@@ -147,12 +142,10 @@ func registerRemove(parent *cobra.Command) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			alias := args[0]
 			if err := credential.Remove(alias); err != nil {
-				output.WriteError(os.Stderr, err)
-				return nil
+				return err
 			}
 			if err := config.RemoveOrganization(alias); err != nil {
-				output.WriteError(os.Stderr, err)
-				return nil
+				return err
 			}
 			shared.WriteItem(map[string]any{
 				"status": "removed",
