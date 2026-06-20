@@ -7,12 +7,16 @@
 package output
 
 import (
-	"bytes"
 	"io"
 	"os"
 
 	out "github.com/shhac/lib-agent-output"
-	"gopkg.in/yaml.v3"
+
+	// Registers the shared YAML encoder for out.FormatYAML (side-effect import),
+	// so `--format yaml` works without a local encoder copy. The encoder lives in
+	// lib-agent-cli, which carries the gopkg.in/yaml.v3 dependency; lib-agent-output
+	// stays dependency-free.
+	_ "github.com/shhac/lib-agent-cli/yaml"
 )
 
 // Format and its values come from the shared contract; ParseFormat is therefore
@@ -29,22 +33,6 @@ var (
 	ParseFormat = out.ParseFormat
 	WriteError  = out.WriteError
 )
-
-// init registers agent-incident's YAML encoder with lib-agent-output, so YAML
-// support (and its yaml.v3 dependency) stays in this CLI while the core library
-// remains dependency-free.
-func init() {
-	out.RegisterEncoder(out.FormatYAML, func(v any) ([]byte, error) {
-		var buf bytes.Buffer
-		enc := yaml.NewEncoder(&buf)
-		enc.SetIndent(2)
-		if err := enc.Encode(v); err != nil {
-			return nil, err
-		}
-		_ = enc.Close()
-		return buf.Bytes(), nil
-	})
-}
 
 // ResolveFormat keeps agent-incident's single-return signature (the commands
 // call it without error handling): a bad flag falls back to the default rather
