@@ -26,7 +26,7 @@ AUTH SETUP
   agent-incident auth remove <alias>
 
 INCIDENTS (triage starting point)
-  agent-incident incident list [--status <status>] [--severity <sev>] [--since <time>] [--full]
+  agent-incident incident list [--status <status>] [--severity <sev>] [--from <time>] [--full]
   agent-incident incident get <id-or-reference>       # accepts INC-2000, 2000, or UUID
   agent-incident incident create --name <text> --severity <sev-id> [--summary <text>]
   agent-incident incident edit <id> [--name <text>] [--severity <name-or-id>] [--status <name-or-id>] [--summary <text>] [--field "Name=value"] [--timestamp "Name=time"]
@@ -77,10 +77,11 @@ TIME FORMATS
   Unix epoch seconds
 
 GLOBAL FLAGS
-  --organization <alias>   Organization alias (or INCIDENT_API_KEY env)
+  --org/-o <alias>         Organization alias (or INCIDENT_API_KEY env)
   --api-key <key>          Direct API key override
   --format json|yaml|jsonl (default: jsonl for lists, json for single items)
   --timeout <ms>
+  -d/--debug               Log HTTP diagnostics to stderr
 
 Per-domain details: agent-incident <command> usage
 `
