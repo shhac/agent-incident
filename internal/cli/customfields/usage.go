@@ -4,7 +4,7 @@ const usageText = `agent-incident custom-fields — Custom field reference
 
 COMMANDS
   custom-fields list
-  custom-fields get <id>
+  custom-fields get <id>...
 
 NOTES
   Custom fields are organization-defined metadata attached to incidents.

@@ -4,7 +4,7 @@ const usageText = `agent-incident statuses — Incident status lifecycle states
 
 COMMANDS
   agent-incident statuses list          List all configured incident statuses
-  agent-incident statuses get <id>      Get a single incident status by ID
+  agent-incident statuses get <id>...   Get one or more incident statuses by ID (1..N ids; NDJSON by default)
 
 FIELDS
   id            Unique status identifier

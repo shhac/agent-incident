@@ -4,7 +4,7 @@ const usageText = `agent-incident roles — Incident role definitions
 
 COMMANDS
   agent-incident roles list          List all configured incident roles
-  agent-incident roles get <id>      Get a single incident role by ID
+  agent-incident roles get <id>...   Get one or more incident roles by ID (1..N ids; NDJSON by default)
 
 FIELDS
   id             Unique role identifier
@@ -19,7 +19,7 @@ FIELDS
 NOTES
   Incident roles are read-only configuration — they are defined in the
   incident.io dashboard and assigned to users during incidents. Use
-  "agent-incident incidents get <id>" to see role assignments on an incident.
+  "agent-incident incidents get <id>..." to see role assignments on an incident.
 
 EXAMPLES
   # List all incident roles

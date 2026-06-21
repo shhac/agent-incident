@@ -4,7 +4,7 @@ const usageText = `agent-incident follow-ups — Post-incident action items
 
 COMMANDS
   follow-ups list [--incident <id>] [--limit N] [--after <cursor>]
-  follow-ups get <id>
+  follow-ups get <id>...
 
 NOTES
   Follow-ups are action items created after an incident is resolved.

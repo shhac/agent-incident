@@ -4,7 +4,7 @@ const usageText = `agent-incident actions — In-incident tasks
 
 COMMANDS
   actions list [--incident <id>] [--limit N] [--after <cursor>]
-  actions get <id>
+  actions get <id>...
 
 NOTES
   Actions are tasks created during an incident (e.g., "restart service X").

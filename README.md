@@ -2,7 +2,7 @@
 
 incident.io triage CLI for AI agents. Incidents, alerts, schedules, escalations — not full incident.io administration.
 
-- **Token-efficient output** — NDJSON for lists, JSON for single items, YAML available. Compact and null-pruned by default. `--full` for complete API responses
+- **Token-efficient output** — NDJSON for lists and gets (one line per id), YAML available. Compact and null-pruned by default. `--full` for complete API responses
 - **Structured error classification** — every error includes `fixable_by: agent|human|retry` so AI agents can self-correct without parsing messages
 - **Triage-focused** — only the commands you need during an investigation, not the 165+ incident.io API endpoints
 - **Multi-org support** — switch between incident.io organizations with `--org`, credentials stored in macOS Keychain
@@ -53,7 +53,7 @@ export INCIDENT_API_KEY=<key>
 # All active incidents
 agent-incident incident list --status active
 
-# Full details (accepts INC-2000, 2000, or UUID)
+# Full details (accepts INC-2000, 2000, or UUID; also accepts multiple ids)
 agent-incident incident get INC-2000
 ```
 
@@ -101,11 +101,20 @@ agent-incident
 
 ## Output
 
-- **stdout** — NDJSON for list commands (one object per line), JSON for single-item commands
+- **stdout** — NDJSON for list and get commands (one object per line / one line per id)
 - **stderr** — errors as JSON with `fixable_by` classification
 - **`--format json|yaml|jsonl`** — override the default for any command
 - **Compact by default** — e.g. incidents show `id, name, status, severity, created_at, incident_lead`. Use `--full` for everything
 - **Null-pruned** — empty/null fields stripped from output to save tokens
+
+### Get (single + multi)
+
+`get <id>...` takes one or more ids and returns one result per id, in input order. Default output
+is NDJSON: one line per id — the record, or `{"@unresolved":{"id","reason","fixable_by","hint"?}}`
+for an id that couldn't be resolved (e.g. not found / bad id). `--format json|yaml` collapses to
+one `{"data":[…], "@unresolved":[…]}` envelope. A single `get <id>` is just the one-element case
+(NDJSON one line by default; pass `--format json` for the object). Item-level misses stay on stdout
+and exit 0; only a command-level failure (auth, network) goes to stderr with exit 1 and empty stdout.
 
 ## Error output
 

@@ -23,7 +23,7 @@ Query and manage incident.io incidents, alerts, schedules, escalations, and stat
 ### Incident response workflow
 
 1. **What's happening?** `incident list --status active` to see active incidents
-2. **How bad is it?** `incident get INC-2000` for full details including severity and timeline
+2. **How bad is it?** `incident get INC-2000` for full details including severity and timeline (also accepts multiple ids: `incident get INC-2000 INC-2001`)
 3. **What triggered it?** `alert list --status firing` to see current alerts
 4. **Who's on-call?** `oncall schedule entries Engineering --from now --to now+1h`
 5. **Escalate if needed:** `oncall escalation create --incident <id> --path "Primary Path"`
@@ -84,7 +84,7 @@ agent-incident status-page update update <sp-inc-id> --status resolved
 ## Key Concepts
 
 - **Time formats**: relative (`now-15m`, `now-1h`, `now+1h`), RFC3339, or unix epoch
-- **Output**: NDJSON for lists (one object per line), JSON for single items. `--full` for complete API response. `--format json|yaml|jsonl` to override
+- **Output**: NDJSON for lists and gets (one line per id). `--full` for complete API response. `--format json|yaml|jsonl` to override. `--format json` on a get returns `{"data":[...],"@unresolved":[...]}` envelope
 - **Compact mode**: List commands omit large fields (description, custom fields, timestamps) by default. Use `--full` to include everything
 - **Name resolution**: Schedule, escalation path, status page, user, severity, status, custom field, timestamp, and catalog entry arguments accept names (case-insensitive, substring match). If the value looks like a ULID it's used as-is; otherwise a list lookup resolves the name to an ID. Ambiguous matches error with options listed.
 - **Pagination**: `--limit N` controls page size, `--after <cursor>` for next page. Cursor is returned in `@pagination` NDJSON line

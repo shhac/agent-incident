@@ -4,7 +4,7 @@ const usageText = `agent-incident severities — Incident severity levels
 
 COMMANDS
   agent-incident severities list          List all configured severities
-  agent-incident severities get <id>      Get a single severity by ID
+  agent-incident severities get <id>...   Get one or more severities by ID (1..N ids; NDJSON by default)
 
 FIELDS
   id            Unique severity identifier

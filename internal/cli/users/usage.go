@@ -4,7 +4,7 @@ const usageText = `agent-incident users — incident.io user management
 
 COMMANDS
   agent-incident users list               List users (compact view by default)
-  agent-incident users get <id>           Get a single user by ID
+  agent-incident users get <id>...        Get one or more users by ID (1..N ids; NDJSON by default)
 
 FLAGS (list)
   --query <text>    Filter users by name or email

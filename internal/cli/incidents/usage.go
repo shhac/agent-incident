@@ -13,8 +13,11 @@ List incidents with optional filters.
   --after    Pagination cursor from previous response
   --full     Return full incident objects (default: compact with id, name, status, severity, created_at, incident_lead)
 
-### incidents get <id>
-Retrieve a single incident with all fields including role assignments, custom fields, timestamps, and external resources.
+### incidents get <id-or-reference>...
+Retrieve one or more incidents by id (accepts INC-2000, 2000, or UUID; 1..N ids). Default output
+is NDJSON — one line per id: the record, or {"@unresolved":{...}} for an id not found. Pass
+--format json|yaml for a {"data":[...],"@unresolved":[...]} envelope. Includes all fields:
+role assignments, custom fields, timestamps, and external resources.
 
 ### incidents create
 Create a new incident.

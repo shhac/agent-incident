@@ -4,9 +4,9 @@ const usageText = `agent-incident catalog — Service catalog queries
 
 COMMANDS
   catalog types list
-  catalog types get <id>
+  catalog types get <id>...
   catalog entries list [--type <id>] [--query <text>] [--limit N] [--after <cursor>]
-  catalog entries get <id>
+  catalog entries get <id>...
 
 NOTES
   The catalog maps services, teams, and other entities to incidents.

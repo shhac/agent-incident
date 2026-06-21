@@ -19,11 +19,14 @@ Examples:
   agent-incident alerts list --status firing,resolved --limit 10
   agent-incident alerts list --full --after <cursor>
 
-### alerts get <id>
-Retrieve a single alert by ID.
+### alerts get <id>...
+Retrieve one or more alerts by ID (1..N ids). Default output is NDJSON — one line per id: the
+record, or {"@unresolved":{...}} for an id not found. Pass --format json|yaml for a
+{"data":[...],"@unresolved":[...]} envelope.
 
 Examples:
   agent-incident alerts get 01HXYZ123
+  agent-incident alerts get 01HXYZ123 01HABC456
 
 ### alerts create
 Create an alert event via an HTTP alert source.
@@ -46,7 +49,8 @@ Examples:
 
 ## Output
 - List commands output NDJSON (one object per line) by default.
-- Get/create commands output JSON by default.
+- Get commands output NDJSON (one line per id) by default; --format json|yaml for envelope.
+- Create commands output JSON by default.
 - Use --format yaml or --format jsonl to change.
 - Compact view (default for list) shows: id, title, status, created_at.
 - Use --full to see all fields including description, deduplication_key, source_url, updated_at.

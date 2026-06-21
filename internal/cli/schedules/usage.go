@@ -7,8 +7,9 @@ const usageText = `# schedules domain — agent-incident CLI
 ### schedules list
 List all on-call schedules.
 
-### schedules get <name-or-id>
-Retrieve a single schedule by name or ID, including timezone and metadata.
+### schedules get <name-or-id>...
+Retrieve one or more schedules by name or ID (1..N ids). Default output is NDJSON — one line per
+id: the record, or {"@unresolved":{...}} for an id/name not found.
 
 ### schedules entries <name-or-id>
 List schedule entries (who is on-call) for a time window.

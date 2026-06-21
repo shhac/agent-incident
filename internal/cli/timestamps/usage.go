@@ -4,7 +4,7 @@ const usageText = `agent-incident timestamps — Incident timestamp definitions
 
 COMMANDS
   agent-incident timestamp list          List all timestamp definitions
-  agent-incident timestamp get <id>      Get a single timestamp definition by ID
+  agent-incident timestamp get <id>...   Get one or more timestamp definitions by ID (1..N ids; NDJSON by default)
 
 FIELDS
   id    Unique timestamp identifier
