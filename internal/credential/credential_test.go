@@ -1,6 +1,8 @@
 package credential
 
 import (
+	"os"
+	"path/filepath"
 	"sort"
 	"testing"
 
@@ -38,6 +40,57 @@ func TestStoreAndGet(t *testing.T) {
 			t.Skip("keychain sentinel returned — keychain access may be blocked in test env")
 		}
 		t.Fatalf("expected API key %q, got %q", "test-api-key-123", got.APIKey)
+	}
+}
+
+// TestStore_Headless_FileFallback exercises the real credential-WRITE path
+// non-interactively. Setting the per-CLI keychain opt-out (derived by
+// lib-agent-cli from the "app.paulie.agent-incident" service) makes the keychain
+// backend report unavailable, so Store deterministically takes the 0600 file
+// fallback on every platform — including darwin, where it would otherwise reach
+// the `security` CLI and its GUI prompt. The per-CLI env var also proves the
+// lib's prefix derivation.
+func TestStore_Headless_FileFallback(t *testing.T) {
+	t.Setenv("AGENT_INCIDENT_NO_KEYCHAIN", "1")
+	dir := t.TempDir()
+	config.SetConfigDir(dir)
+	t.Cleanup(func() { config.SetConfigDir("") })
+
+	storage, err := Store("headless", Credential{APIKey: "api-headless"})
+	if err != nil {
+		t.Fatalf("Store: %v", err)
+	}
+	if storage != "file" {
+		t.Fatalf("storage = %q, want \"file\" (keychain opt-out should force the file path)", storage)
+	}
+
+	credsPath := filepath.Join(dir, "credentials.json")
+	info, err := os.Stat(credsPath)
+	if err != nil {
+		t.Fatalf("credentials file not written: %v", err)
+	}
+	if mode := info.Mode().Perm(); mode != 0o600 {
+		t.Errorf("credentials mode = %o, want 0600", mode)
+	}
+
+	got, err := Get("headless")
+	if err != nil {
+		t.Fatalf("Get: %v", err)
+	}
+	if got.KeychainManaged {
+		t.Error("KeychainManaged = true, want false (keychain should not have been used)")
+	}
+	if got.APIKey != "api-headless" {
+		t.Errorf("APIKey = %q, want %q (file fallback stores the key directly, not the sentinel)", got.APIKey, "api-headless")
+	}
+
+	if err := Remove("headless"); err != nil {
+		t.Fatalf("Remove: %v", err)
+	}
+	_, err = Get("headless")
+	var notFound *NotFoundError
+	if !isNotFoundError(err, &notFound) {
+		t.Fatalf("after Remove, Get should return *NotFoundError, got %T: %v", err, err)
 	}
 }
 
