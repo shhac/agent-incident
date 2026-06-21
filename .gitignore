@@ -19,7 +19,7 @@ release
 .claude/*.local.json
 CLAUDE.local.md
 
-# design docs are tracked (checked in); keep extracted vendor JS local only
+# extracted vendor JS — keep local
 design-docs/timeline-fn.js
 
 # api spec
