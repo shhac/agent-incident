@@ -46,18 +46,12 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:   "get <id>",
-		Short: "Get a single escalation by ID",
-		Args:  cobra.ExactArgs(1),
+		Use:   "get <id>...",
+		Short: "Get a single escalation by ID (one or more IDs)",
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g := globals()
-			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
-				escalation, err := client.GetEscalation(ctx, args[0])
-				if err != nil {
-					return err
-				}
-				shared.WriteItem(escalation, g.Format)
-				return nil
+			return shared.GetEntities(globals(), args, func(ctx context.Context, client *api.Client, id string) (any, error) {
+				return client.GetEscalation(ctx, id)
 			})
 		},
 	}
@@ -139,18 +133,12 @@ func registerPathsList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerPathsGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:   "get <id>",
-		Short: "Get a single escalation path by ID",
-		Args:  cobra.ExactArgs(1),
+		Use:   "get <id>...",
+		Short: "Get a single escalation path by ID (one or more IDs)",
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g := globals()
-			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
-				path, err := client.GetEscalationPath(ctx, args[0])
-				if err != nil {
-					return err
-				}
-				shared.WriteItem(path, g.Format)
-				return nil
+			return shared.GetEntities(globals(), args, func(ctx context.Context, client *api.Client, id string) (any, error) {
+				return client.GetEscalationPath(ctx, id)
 			})
 		},
 	}

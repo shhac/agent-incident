@@ -1,8 +1,10 @@
 package shared
 
 import (
+	"context"
 	"os"
 
+	"github.com/shhac/agent-incident/internal/api"
 	agenterrors "github.com/shhac/agent-incident/internal/errors"
 	"github.com/shhac/agent-incident/internal/output"
 	libcli "github.com/shhac/lib-agent-cli/cli"
@@ -61,6 +63,21 @@ func CursorPagination(cursor string) *output.Pagination {
 		return nil
 	}
 	return &output.Pagination{HasMore: true, NextCursor: cursor}
+}
+
+// GetEntities runs the family's multi-capable get for the incident domain: it
+// sets up one client, then resolves each id through getOne and streams the
+// result per the shared get contract (NDJSON by default — one record or
+// {"@unresolved":…} per id in input order; item-level misses stay on stdout,
+// command-level failures bubble to the single sink). getOne returns the record
+// for an id, or a classified *agenterrors.APIError (a lib-agent-output *Error)
+// so a 404/bad input becomes an @unresolved record rather than aborting.
+func GetEntities(g *GlobalFlags, args []string, getOne func(ctx context.Context, client *api.Client, id string) (any, error)) error {
+	return WithClient(g, func(ctx context.Context, client *api.Client) error {
+		return libcli.EntityGet(os.Stdout, g.Format, args, func(id string) (any, error) {
+			return getOne(ctx, client, id)
+		})
+	})
 }
 
 // RequireFlag returns a structured fixable_by:agent error when a flag value is

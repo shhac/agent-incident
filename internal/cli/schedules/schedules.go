@@ -46,22 +46,16 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:   "get <name-or-id>",
-		Short: "Get a single schedule by name or ID",
-		Args:  cobra.ExactArgs(1),
+		Use:   "get <name-or-id>...",
+		Short: "Get a single schedule by name or ID (one or more)",
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g := globals()
-			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
-				id, err := shared.ResolveScheduleID(ctx, client, args[0])
+			return shared.GetEntities(globals(), args, func(ctx context.Context, client *api.Client, id string) (any, error) {
+				resolvedID, err := shared.ResolveScheduleID(ctx, client, id)
 				if err != nil {
-					return err
+					return nil, err
 				}
-				schedule, err := client.GetSchedule(ctx, id)
-				if err != nil {
-					return err
-				}
-				shared.WriteItem(schedule, g.Format)
-				return nil
+				return client.GetSchedule(ctx, resolvedID)
 			})
 		},
 	}

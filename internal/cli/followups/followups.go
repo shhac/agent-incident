@@ -50,18 +50,12 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:   "get <id>",
-		Short: "Get follow-up details",
-		Args:  cobra.ExactArgs(1),
+		Use:   "get <id>...",
+		Short: "Get follow-up details (one or more IDs)",
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g := globals()
-			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
-				item, err := client.GetFollowUp(ctx, args[0])
-				if err != nil {
-					return err
-				}
-				shared.WriteItem(item, g.Format)
-				return nil
+			return shared.GetEntities(globals(), args, func(ctx context.Context, client *api.Client, id string) (any, error) {
+				return client.GetFollowUp(ctx, id)
 			})
 		},
 	}

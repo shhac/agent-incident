@@ -119,19 +119,12 @@ func registerList(parent *cobra.Command, globals shared.GlobalsFunc) {
 
 func registerGet(parent *cobra.Command, globals shared.GlobalsFunc) {
 	cmd := &cobra.Command{
-		Use:   "get <id-or-reference>",
-		Short: "Get a single incident by ID or reference (e.g. INC-2000 or 2000)",
-		Args:  cobra.ExactArgs(1),
+		Use:   "get <id-or-reference>...",
+		Short: "Get one or more incidents by ID or reference (e.g. INC-2000 or 2000)",
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g := globals()
-			return shared.WithClient(g, func(ctx context.Context, client *api.Client) error {
-				id := normalizeIncidentRef(args[0])
-				incident, err := client.GetIncident(ctx, id)
-				if err != nil {
-					return err
-				}
-				shared.WriteItem(incident, g.Format)
-				return nil
+			return shared.GetEntities(globals(), args, func(ctx context.Context, client *api.Client, id string) (any, error) {
+				return client.GetIncident(ctx, normalizeIncidentRef(id))
 			})
 		},
 	}
