@@ -187,4 +187,4 @@ make dev ARGS="incident list --status active"
 
 ## License
 
-MIT
+PolyForm Perimeter License 1.0.0 — see [LICENSE](LICENSE).
