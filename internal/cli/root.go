@@ -19,6 +19,7 @@ import (
 	"github.com/shhac/agent-incident/internal/cli/statuspages"
 	"github.com/shhac/agent-incident/internal/cli/timestamps"
 	"github.com/shhac/agent-incident/internal/cli/users"
+	"github.com/shhac/agent-incident/internal/credential"
 	"github.com/shhac/agent-incident/internal/output"
 	libcli "github.com/shhac/lib-agent-cli/cli"
 	agentmcp "github.com/shhac/lib-agent-mcp"
@@ -88,7 +89,10 @@ func newRootCmd(version string) *cobra.Command {
 	exposeGroups(root,
 		"action", "alert", "follow-up", "incident", "oncall", "ref", "status-page")
 
-	root.AddCommand(agentmcp.Command(root, agentmcp.WithHiddenFlags("color", "expose")))
+	root.AddCommand(agentmcp.Command(root,
+		agentmcp.WithHiddenFlags("color", "expose"),
+		agentmcp.WithOAuthKeyringService(credential.MCPKeychainService()),
+	))
 
 	return root
 }

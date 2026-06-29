@@ -17,6 +17,10 @@ const keychainSentinel = "__KEYCHAIN__"
 // CLI owns this identifier.
 const keychainService = "app.paulie.agent-incident"
 
+// MCPKeychainService is the Keychain service for the MCP server's local-OAuth
+// secrets — the CLI's service plus a ".mcp" namespace, separate from the API creds.
+func MCPKeychainService() string { return keychainService + ".mcp" }
+
 var keychain = creds.NewKeychain(keychainService)
 
 type Credential struct {
