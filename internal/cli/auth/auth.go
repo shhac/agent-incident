@@ -29,6 +29,7 @@ func Register(root *cobra.Command) {
 
 func registerAdd(parent *cobra.Command) {
 	var apiKey string
+	var form bool
 
 	cmd := &cobra.Command{
 		Use:   "add <alias>",
@@ -36,7 +37,16 @@ func registerAdd(parent *cobra.Command) {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			alias := args[0]
-			if err := shared.RequireFlag("api-key", apiKey, "Provide --api-key <key>"); err != nil {
+
+			if form {
+				filled, err := promptSecretViaDialog(cmd.Context(), alias, apiKey)
+				if err != nil {
+					return err
+				}
+				apiKey = filled
+			}
+
+			if err := shared.RequireFlag("api-key", apiKey, "Provide --api-key <key>, or use --form for a native OS dialog"); err != nil {
 				return err
 			}
 
@@ -58,6 +68,8 @@ func registerAdd(parent *cobra.Command) {
 		},
 	}
 	cmd.Flags().StringVar(&apiKey, "api-key", "", "API key for this organization (required)")
+	cmd.Flags().BoolVar(&form, "form", false,
+		"Prompt for the API key via a native OS dialog (LLM-safe secret entry; the key is typed directly into the OS, never seen by the agent)")
 	parent.AddCommand(cmd)
 }
 

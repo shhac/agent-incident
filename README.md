@@ -43,6 +43,14 @@ agent-incident auth add prod --api-key <INCIDENT_API_KEY>
 agent-incident auth check
 ```
 
+Prefer `--form` for LLM-safe secret entry: it pops a native OS dialog so the key
+is typed directly into the operating system, never seen by the agent (nor placed
+on the command line, in shell history, or in the agent transcript):
+
+```bash
+agent-incident auth add prod --form
+```
+
 Or use an environment variable directly (no setup needed):
 
 ```bash

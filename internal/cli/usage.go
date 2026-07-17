@@ -20,6 +20,7 @@ const usageText = `agent-incident — incident.io triage CLI for AI agents
 
 AUTH SETUP
   agent-incident auth add <alias> --api-key <key>
+  agent-incident auth add <alias> --form    # LLM-safe: prompt for the key via a native OS dialog
   agent-incident auth check [alias]
   agent-incident auth default <alias>
   agent-incident auth list

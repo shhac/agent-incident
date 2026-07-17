@@ -128,6 +128,10 @@ If credentials aren't configured yet:
 agent-incident auth add <alias> --api-key <key>
 agent-incident auth check
 ```
+Prefer `--form` for LLM-safe secret entry — it pops a native OS dialog so the key is typed directly into the OS, never seen by the agent:
+```bash
+agent-incident auth add <alias> --form
+```
 Keys are managed at `https://app.incident.io/~/settings/api-keys`.
 
 Environment variable also works: `INCIDENT_API_KEY=<key>`.
