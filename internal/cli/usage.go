@@ -19,8 +19,9 @@ func registerUsageCommand(root *cobra.Command) {
 const usageText = `agent-incident — incident.io triage CLI for AI agents
 
 AUTH SETUP
-  agent-incident auth add <alias> --api-key <key>
-  agent-incident auth add <alias> --form    # LLM-safe: prompt for the key via a native OS dialog
+  agent-incident auth add <alias> --form    # preferred: prompt for the key via a native OS dialog (key never seen by the agent)
+  agent-incident auth add <alias>           # non-interactive: pipe the key on stdin (keeps it off argv)
+  # Avoid --api-key <key> with a pasted secret — it lands on argv, in shell history, and in the agent transcript.
   agent-incident auth check [alias]
   agent-incident auth default <alias>
   agent-incident auth list

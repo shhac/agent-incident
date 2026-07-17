@@ -55,6 +55,74 @@ func TestAuthAdd(t *testing.T) {
 	}
 }
 
+// TestAuthAddStdinFills verifies that a key piped on stdin is used when no
+// --api-key flag is given. The keychain opt-out forces the deterministic file
+// path so the stored value can be read back and compared.
+func TestAuthAddStdinFills(t *testing.T) {
+	t.Setenv("AGENT_INCIDENT_NO_KEYCHAIN", "1")
+	config.SetConfigDir(t.TempDir())
+
+	root := newTestRoot()
+	root.SetOut(&bytes.Buffer{})
+	root.SetIn(strings.NewReader("stdin-key-123\n"))
+	root.SetArgs([]string{"auth", "add", "myorg"})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	cred, err := credential.Get("myorg")
+	if err != nil {
+		t.Fatalf("credential not found after add: %v", err)
+	}
+	if cred.APIKey != "stdin-key-123" {
+		t.Errorf("expected api key from stdin, got %q", cred.APIKey)
+	}
+}
+
+// TestAuthAddFlagWinsOverStdin verifies precedence: an explicit --api-key flag
+// takes priority over a value piped on stdin.
+func TestAuthAddFlagWinsOverStdin(t *testing.T) {
+	t.Setenv("AGENT_INCIDENT_NO_KEYCHAIN", "1")
+	config.SetConfigDir(t.TempDir())
+
+	root := newTestRoot()
+	root.SetOut(&bytes.Buffer{})
+	root.SetIn(strings.NewReader("stdin-key\n"))
+	root.SetArgs([]string{"auth", "add", "myorg", "--api-key", "flag-key"})
+
+	if err := root.Execute(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	cred, err := credential.Get("myorg")
+	if err != nil {
+		t.Fatalf("credential not found after add: %v", err)
+	}
+	if cred.APIKey != "flag-key" {
+		t.Errorf("expected flag to win over stdin, got %q", cred.APIKey)
+	}
+}
+
+// TestAuthAddNoKeyErrors verifies that with no flag, no piped stdin, and no
+// --form, the command surfaces the RequireFlag error.
+func TestAuthAddNoKeyErrors(t *testing.T) {
+	config.SetConfigDir(t.TempDir())
+
+	root := newTestRoot()
+	root.SetOut(&bytes.Buffer{})
+	root.SetIn(&bytes.Buffer{})
+	root.SetArgs([]string{"auth", "add", "myorg"})
+
+	err := root.Execute()
+	if err == nil {
+		t.Fatal("expected an error when no api key is supplied")
+	}
+	if !strings.Contains(err.Error(), "--api-key is required") {
+		t.Errorf("expected --api-key required error, got %v", err)
+	}
+}
+
 func TestAuthCheck(t *testing.T) {
 	tmpDir := t.TempDir()
 	config.SetConfigDir(tmpDir)

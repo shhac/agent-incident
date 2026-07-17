@@ -9,6 +9,7 @@ import (
 	"github.com/shhac/agent-incident/internal/cli/shared"
 	"github.com/shhac/agent-incident/internal/config"
 	"github.com/shhac/agent-incident/internal/credential"
+	"github.com/shhac/lib-agent-cli/creds"
 )
 
 // Register adds the auth command group to the root command.
@@ -38,6 +39,16 @@ func registerAdd(parent *cobra.Command) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			alias := args[0]
 
+			// Precedence: --api-key flag > secret piped on stdin > --form dialog.
+			// ReadSecret keeps a piped key off argv (and out of shell history,
+			// ps, and the agent transcript) and returns "" on an interactive
+			// tty rather than blocking, so the --form fallback still fires.
+			var err error
+			apiKey, err = creds.ReadSecret(cmd.InOrStdin(), apiKey)
+			if err != nil {
+				return err
+			}
+
 			if form {
 				filled, err := promptSecretViaDialog(cmd.Context(), alias, apiKey)
 				if err != nil {
@@ -46,7 +57,7 @@ func registerAdd(parent *cobra.Command) {
 				apiKey = filled
 			}
 
-			if err := shared.RequireFlag("api-key", apiKey, "Provide --api-key <key>, or use --form for a native OS dialog"); err != nil {
+			if err := shared.RequireFlag("api-key", apiKey, "Provide --api-key <key>, pipe it on stdin (printf '%s' \"$KEY\" | agent-incident auth add <alias>), or use --form for a native OS dialog"); err != nil {
 				return err
 			}
 
@@ -67,7 +78,7 @@ func registerAdd(parent *cobra.Command) {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&apiKey, "api-key", "", "API key for this organization (required)")
+	cmd.Flags().StringVar(&apiKey, "api-key", "", "API key for this organization; prefer piping it on stdin or --form so the secret stays off argv (required unless piped on stdin or entered via --form)")
 	cmd.Flags().BoolVar(&form, "form", false,
 		"Prompt for the API key via a native OS dialog (LLM-safe secret entry; the key is typed directly into the OS, never seen by the agent)")
 	parent.AddCommand(cmd)
