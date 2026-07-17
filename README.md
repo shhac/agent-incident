@@ -38,18 +38,25 @@ go install github.com/shhac/agent-incident/cmd/agent-incident@latest
 
 ### 1. Add an organization
 
-```bash
-agent-incident auth add prod --api-key <INCIDENT_API_KEY>
-agent-incident auth check
-```
-
-Prefer `--form` for LLM-safe secret entry: it pops a native OS dialog so the key
-is typed directly into the operating system, never seen by the agent (nor placed
-on the command line, in shell history, or in the agent transcript):
+Set up an org **without putting the key on the command line**. Prefer `--form`
+for interactive use: it pops a native OS dialog so the key is typed directly into
+the operating system, never seen by the agent (nor placed on the command line, in
+shell history, or in the agent transcript):
 
 ```bash
 agent-incident auth add prod --form
+agent-incident auth check
 ```
+
+For non-interactive use (CI, scripts, headless hosts), pipe the key on stdin so
+it stays off argv:
+
+```bash
+printf '%s' "$KEY" | agent-incident auth add prod
+```
+
+Avoid passing a pasted secret to `--api-key <key>` — that value lands on argv, in
+shell history, and in the agent transcript. Use `--form` or piped stdin instead.
 
 Or use an environment variable directly (no setup needed):
 
@@ -143,9 +150,9 @@ All errors are written to stderr as structured JSON:
 ## Multi-org support
 
 ```bash
-# Add multiple organizations
-agent-incident auth add prod --api-key <key>
-agent-incident auth add staging --api-key <key>
+# Add multiple organizations (--form for a dialog, or pipe the key on stdin)
+printf '%s' "$PROD_KEY" | agent-incident auth add prod
+printf '%s' "$STAGING_KEY" | agent-incident auth add staging
 
 # Query a specific org
 agent-incident incident list --status active --org staging
