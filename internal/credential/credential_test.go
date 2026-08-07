@@ -1,9 +1,11 @@
 package credential
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
+	"sync"
 	"testing"
 
 	"github.com/shhac/agent-incident/internal/config"
@@ -182,6 +184,54 @@ func TestListEmpty(t *testing.T) {
 	}
 	if len(names) != 0 {
 		t.Fatalf("expected 0 names, got %d", len(names))
+	}
+}
+
+// Concurrent stores must not lose each other's entries.
+//
+// This is the failure that matters most for THIS index: the keychain write has
+// already succeeded by the time the index is written, so an entry lost to a
+// racing writer leaves a live secret in the OS keychain that nothing
+// references — invisible to `auth list` and unreachable by `auth remove`, which
+// looks the name up in the index first.
+//
+// The keychain opt-out forces the deterministic file-fallback path, so the test
+// measures the index write rather than the host's secret store.
+func TestConcurrentStoresDoNotLoseEntries(t *testing.T) {
+	t.Setenv("AGENT_INCIDENT_NO_KEYCHAIN", "1")
+	setupTestDir(t)
+
+	const writers = 20
+	var wg sync.WaitGroup
+	for i := range writers {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			name := fmt.Sprintf("org-%02d", i)
+			if _, err := Store(name, Credential{APIKey: fmt.Sprintf("api-key-%02d", i)}); err != nil {
+				t.Errorf("Store: %v", err)
+			}
+		}(i)
+	}
+	wg.Wait()
+
+	names, err := List()
+	if err != nil {
+		t.Fatalf("List: %v", err)
+	}
+	if len(names) != writers {
+		t.Errorf("%d of %d concurrent Store calls survived — updates were lost", len(names), writers)
+	}
+	for i := range writers {
+		name := fmt.Sprintf("org-%02d", i)
+		got, err := Get(name)
+		if err != nil {
+			t.Errorf("%s was lost from the index: %v", name, err)
+			continue
+		}
+		if want := fmt.Sprintf("api-key-%02d", i); got.APIKey != want {
+			t.Errorf("%s round-tripped as %q, want %q", name, got.APIKey, want)
+		}
 	}
 }
 

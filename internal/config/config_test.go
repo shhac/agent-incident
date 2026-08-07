@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 )
 
@@ -145,6 +147,64 @@ func TestSetDefaultNonExistent(t *testing.T) {
 	cfg := Read()
 	if cfg.DefaultOrg != "a" {
 		t.Fatalf("default should remain %q, got %q", "a", cfg.DefaultOrg)
+	}
+}
+
+// Concurrent StoreOrganization calls must not lose each other's entries.
+//
+// Before updateConfig routed through creds.Store.Update, StoreOrganization did
+// Read() (from the shared in-memory cache) -> mutate -> Write(). Two concurrent
+// CLI invocations — in-process sharing the package cache, or across processes
+// sharing config.json — each built their write from a snapshot taken before the
+// other's landed, so all but the last writer's organization were silently
+// erased.
+func TestConcurrentStoreOrganizationDoesNotLoseEntries(t *testing.T) {
+	setupTestDir(t)
+
+	const writers = 20
+	var wg sync.WaitGroup
+	for i := range writers {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			if err := StoreOrganization(fmt.Sprintf("org-%02d", i)); err != nil {
+				t.Errorf("StoreOrganization: %v", err)
+			}
+		}(i)
+	}
+	wg.Wait()
+
+	ClearCache()
+	cfg := Read()
+	if len(cfg.Organizations) != writers {
+		t.Fatalf("%d of %d concurrent StoreOrganization calls survived — updates were lost", len(cfg.Organizations), writers)
+	}
+	for i := range writers {
+		name := fmt.Sprintf("org-%02d", i)
+		if _, ok := cfg.Organizations[name]; !ok {
+			t.Errorf("%s was lost from config.json", name)
+		}
+	}
+}
+
+// config.json now goes through creds.Store (see updateConfig), which writes
+// every file 0600 regardless of content — one audited place to get file
+// permissions right rather than a per-file policy. That's a tightening from the
+// previous 0644 default, not a regression: this directory is shared with
+// credentials.json, which holds a real API key whenever the keychain is
+// unavailable.
+func TestConfigFilePerms(t *testing.T) {
+	setupTestDir(t)
+
+	if err := Write(defaultConfig()); err != nil {
+		t.Fatalf("Write: %v", err)
+	}
+	info, err := os.Stat(filepath.Join(ConfigDir(), "config.json"))
+	if err != nil {
+		t.Fatalf("config file not written: %v", err)
+	}
+	if perm := info.Mode().Perm(); perm != 0o600 {
+		t.Errorf("config file perms = %o, want 600", perm)
 	}
 }
 
