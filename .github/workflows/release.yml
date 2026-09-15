@@ -16,6 +16,9 @@ jobs:
     secrets: inherit
     with:
       name: agent-incident
-      desc: "incident.io triage CLI for AI agents"
+      # Homebrew's desc audit requires a leading capital, so the brand cannot
+      # come first — "Incident.io" would be wrong. The shared workflow enforces
+      # this.
+      desc: "Triage CLI for incident.io, built for AI agents"
       formula_class: AgentIncident
       help_match: "incident.io triage CLI"
